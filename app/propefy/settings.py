@@ -58,7 +58,7 @@ ROOT_URLCONF = 'propefy.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR,'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -130,5 +130,11 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = '/vol/web'
 STATIC_ROOT = '/vol/web/static'
 
+
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'propefy.estate@gmail.com'
+EMAIL_HOST_PASSWORD = 'd#22wWzqAq1221aDDGhjK'
+EMAIL_PORT = 587
 
 AUTH_USER_MODEL = 'core.User'

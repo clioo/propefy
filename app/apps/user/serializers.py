@@ -1,6 +1,11 @@
 from django.contrib.auth import get_user_model, authenticate
 from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
+from django.template.loader import render_to_string
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from apps.core.tokens import account_activation_token
+from django.utils.encoding import force_bytes, force_text
+from django.core.mail import EmailMessage
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -12,7 +17,22 @@ class UserSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         """Create a new user with encrypted password and return it"""
-        return get_user_model().objects.create_user(**validated_data)
+        validated_data['is_active'] = False
+        user = get_user_model().objects.create_user(**validated_data)
+        current_site = '127.0.0.1:8000'
+        mail_subject = 'Activa tu cuenta propefy'
+        message = render_to_string('acc_active_email.html', {
+            'user': validated_data.get('name'),
+            'domain': current_site,
+            'uid':urlsafe_base64_encode(force_bytes(user.pk)),
+            'token':account_activation_token.make_token(user),
+        })
+        to_email = validated_data.get('email')
+        email = EmailMessage(
+                    mail_subject, message, to=[to_email]
+        )
+        email.send()
+        return user
 
     def update(self, instance, validated_data):
         """Update the user, setting the password correctly and return it"""
