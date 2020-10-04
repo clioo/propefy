@@ -78,7 +78,7 @@ class Amenidades(models.Model):
 class Inmueble(models.Model):
     status_choices = [
         ('a', 'En venta'),
-        ('v', 'Vendida',),acosta
+        ('v', 'Vendida',),
     ]
     titulo = models.CharField(max_length=255)
     descripcion = models.TextField()
