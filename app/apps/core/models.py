@@ -27,6 +27,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     """Customer user model that support using email instead of username"""
     email = models.EmailField(max_length=255, unique=True)
     name = models.CharField(max_length=255)
+    last_name = models.CharField(max_length=255)
     phone = models.CharField(max_length=10)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
@@ -36,23 +37,33 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class Categoria(models.Model):
     nombre = models.CharField(verbose_name="Categoría", max_length=255)
+    def __str__(self):
+        return self.nombre
 
 
 class TipoPropiedad(models.Model):
     nombre = models.CharField(max_length=255,verbose_name="Tipo")
+    def __str__(self):
+        return self.nombre
 
 
 class Estado(models.Model):
     nombre = models.CharField(max_length=255, verbose_name="Nombre")
+    def __str__(self):
+        return self.nombre
 
 
 class Municipio(models.Model):
     nombre = models.CharField(max_length=255, verbose_name="Nombre")
     estado = models.ForeignKey('Estado', on_delete=models.PROTECT)
+    def __str__(self):
+        return self.nombre
 
 
 class PrecioPeriodo(models.Model):
     nombre = models.CharField(max_length=255, verbose_name="Precio periodo")
+    def __str__(self):
+        return self.nombre
 
 
 class Imagenes(models.Model):
@@ -60,23 +71,36 @@ class Imagenes(models.Model):
     imagen = models.ImageField()
 
 
+class Amenidades(models.Model):
+    pass
+
+
 class Inmueble(models.Model):
     status_choices = [
-        ('v', 'Vendida',),
+        ('a', 'En venta'),
+        ('v', 'Vendida',),acosta
     ]
+    titulo = models.CharField(max_length=255)
+    descripcion = models.TextField()
+    # tipo_transaccion
+    # acepta_credito
     categoria = models.ForeignKey('Categoria', verbose_name="Categoría", on_delete=models.PROTECT)
     tipo_propiedad = models.ForeignKey('TipoPropiedad', verbose_name="Tipo de propiedad", on_delete=models.PROTECT)
     municipio = models.ForeignKey('Municipio', on_delete=models.PROTECT)
     precio = models.FloatField(verbose_name="")
-    precio_periodo = models.ForeignKey('PrecioPeriodo', on_delete=models.PROTECT)
+    # moneda
+    precio_periodo = models.ForeignKey('PrecioPeriodo', on_delete=models.PROTECT,
+                                       blank=True, null=True)
     status = models.CharField(max_length=10, choices=status_choices,
                               blank=True)
     estacionamientos = models.IntegerField(verbose_name="Estacionamientos")
     ambientes = models.IntegerField(verbose_name="Ambientes")
     banos = models.IntegerField(verbose_name="Baños")
-    banos_banos = models.IntegerField(verbose_name="Baños")
+    medios_banos = models.IntegerField(verbose_name="Medios baños")
     latitud = models.FloatField()
     longitud = models.FloatField()
-    vendida = models.BooleanField(default=False)
     creada = models.DateTimeField(auto_now_add=True)
     actualizada = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.titulo
