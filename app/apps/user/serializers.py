@@ -6,19 +6,27 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from apps.core.tokens import account_activation_token
 from django.utils.encoding import force_bytes, force_text
 from django.core.mail import EmailMessage
+from rest_framework.authtoken.models import Token
 
 
 class UserSerializer(serializers.ModelSerializer):
     """Serializers for the user object."""
+    token = serializers.SerializerMethodField()
     class Meta:
         model = get_user_model()
-        fields = ('email', 'password', 'name', 'last_name', 'phone')
+        fields = ('token', 'email', 'password', 'name', 'last_name', 'phone')
+        read_only_fields = ('token',)
         extra_kwargs = {'password': {'write_only': True, 'min_length': 8,
-                                     'max_length': 16}}
+                                     'max_length': 16},
+                        'token': {'read_only': True}}
+
+    def get_token(self, user):
+        token = Token.objects.create(user=user)
+        return token.key
 
     def create(self, validated_data):
         """Create a new user with encrypted password and return it"""
-        validated_data['is_active'] = False
+        validated_data['is_active'] = True
         user = get_user_model().objects.create_user(**validated_data)
         current_site = '127.0.0.1:8000'
         mail_subject = 'Activa tu cuenta propefy'

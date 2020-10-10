@@ -8,9 +8,10 @@ from apps.core.tokens import account_activation_token
 from django.utils.encoding import force_text
 from django.http import HttpResponse
 
-class CreateUserView(generics.CreateAPIView):
+class CreateUserView(generics.CreateAPIView, ObtainAuthToken):
     """Create a new user in the system"""
     serializer_class = UserSerializer
+    renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
 
 
 class CreateTokenView(ObtainAuthToken):
