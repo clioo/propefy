@@ -5,7 +5,7 @@ if ! [ -x "$(command -v docker-compose)" ]; then
   exit 1
 fi
 
-domains=(stageapi2.momenry.com)
+domains=(api.propefy.com)
 rsa_key_size=4096
 data_path="./certbot"
 email="jesus_acosta1996@hotmail.com" # Adding a valid address is strongly recommended
