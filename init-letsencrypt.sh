@@ -1,5 +1,8 @@
 #!/bin/bash
 
+
+# run chmod +x init-letsencrypt.sh and sudo ./init-letsencrypt.sh
+
 if ! [ -x "$(command -v docker-compose)" ]; then
   echo 'Error: docker-compose is not installed.' >&2
   exit 1

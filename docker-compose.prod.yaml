@@ -7,14 +7,6 @@ services:
     volumes:
       - static:/vol/web/static
 
-  celery_worker_read_mmrs:
-    deploy:
-        replicas: 8
-
-  celery_worker_create_mmrs:
-    deploy:
-        replicas: 20
-
   nginx:
     command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
     depends_on:
