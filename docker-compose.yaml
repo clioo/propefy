@@ -1,0 +1,83 @@
+version: '3.4'
+
+services:
+  rabbitmq:
+    container_name: rabbitmq
+    hostname: rabbitmq
+    image: rabbitmq:latest
+    networks:
+      - main
+    ports:
+      - "5672:5672"
+    restart: on-failure
+
+  app:
+      build: .
+      hostname: app
+      expose:
+        - '8000'
+      tty: true
+      stdin_open: true
+      image: app-image
+      networks:
+        - main
+      ports: 
+        - "8000:8000"
+      volumes: 
+        - ./app:/app
+      command: >
+        sh -c "python manage.py wait_for_db  && 
+              python manage.py migrate &&
+              gunicorn momenry.wsgi --access-logfile - --workers 6 --limit-request-line 32768 --limit-request-fields 1000 -b 0.0.0.0:8000"
+      depends_on: 
+        - rabbitmq
+        - redis
+
+  celery_worker_utils:
+    command: sh -c "celery -A propefy worker -l info --concurrency=10 -Q utils"
+    depends_on:
+      - app
+      - rabbitmq
+    deploy:
+      restart_policy:
+        condition: on-failure
+      resources:
+        limits:
+          cpus: '0.50'
+    hostname: celery_worker_utils
+    image: app-image
+    networks:
+      - main
+    restart: on-failure
+    volumes: 
+     - app:/app
+
+  redis:
+    image: redis:latest
+    expose:
+      - '6379'
+    networks:
+      - main
+
+  dashboard:
+    image: app-image
+    command:  flower -A propefy --port=5555
+    networks:
+      - main
+    ports:
+      - 5555:5555
+    environment:
+      - DEBUG=1
+      - SECRET_KEY=dbaa1_i7%*3r9-=z-+_mz4r-!qeed@(-a_r(g@k8jo8y3r27%m
+      - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]
+      - CELERY_BROKER=pyamqp://rabbitmq:5672
+    depends_on:
+      - app
+      - redis
+      - celery_worker_utils
+
+networks:
+  main:
+
+volumes:
+  app:

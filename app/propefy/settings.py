@@ -42,6 +42,10 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'apps.core',
     'apps.user',
+    'drf_yasg',
+    'storages',
+    'django_celery_results',
+    'django_filters'
 ]
 
 MIDDLEWARE = [
@@ -143,6 +147,9 @@ EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 EMAIL_PORT = os.environ.get('EMAIL_PORT')
 AUTH_USER_MODEL = 'core.User'
+
+CELERY_BROKER_URL = 'pyamqp://rabbitmq:5672'
+
 try:
     from .local_settings import *
 except ImportError:
