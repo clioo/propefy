@@ -12,12 +12,10 @@ services:
       - ./envs/local.env
     ports:
       - "8000:8000"
-    depends_on:
-     - db
 
-  db:
-    image: mdillon/postgis
-    environment: 
-        - POSTGRES_DB=momenry
-        - POSTGRES_USER=postgres
-        - POSTGRES_PASSWORD=supersecretpassword
+  # db:
+  #   image: mdillon/postgis
+  #   environment: 
+  #       - POSTGRES_DB=momenry
+  #       - POSTGRES_USER=postgres
+  #       - POSTGRES_PASSWORD=supersecretpassword
