@@ -18,7 +18,7 @@ services:
         - '8000'
       tty: true
       stdin_open: true
-      image: app-image
+      image: propefy-image
       networks:
         - main
       ports: 
@@ -38,6 +38,7 @@ services:
     depends_on:
       - app
       - rabbitmq
+      - redis
     deploy:
       restart_policy:
         condition: on-failure
