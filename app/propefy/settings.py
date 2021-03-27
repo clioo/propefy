@@ -150,6 +150,17 @@ AUTH_USER_MODEL = 'core.User'
 
 CELERY_BROKER_URL = 'pyamqp://rabbitmq:5672'
 
+SWAGGER_SETTINGS = {
+    'USE_SESSION_AUTH': False,
+    'SECURITY_DEFINITIONS': {
+        'Token': {
+            'type': 'apiKey',
+            'in': 'header',
+            'name': 'Authorization'
+        }
+    },
+}
+
 try:
     from .local_settings import *
 except ImportError:
