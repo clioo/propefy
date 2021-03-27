@@ -7,6 +7,7 @@ from apps.core.tokens import account_activation_token
 from django.utils.encoding import force_bytes, force_text
 from django.core.mail import EmailMessage
 from rest_framework.authtoken.models import Token
+from django.conf import settings
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -28,7 +29,7 @@ class UserSerializer(serializers.ModelSerializer):
         """Create a new user with encrypted password and return it"""
         validated_data['is_active'] = True
         user = get_user_model().objects.create_user(**validated_data)
-        current_site = '127.0.0.1:8000'
+        current_site = settings.FRONTEND_BASE_URL
         mail_subject = 'Activa tu cuenta propefy'
         message = render_to_string('acc_active_email.html', {
             'user': validated_data.get('name'),
