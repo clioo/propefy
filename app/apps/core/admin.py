@@ -1,3 +1,46 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.utils.translation import gettext as _
+from apps.core import models
 
-# Register your models here.
+
+class ImagenesInmuebleInline(admin.TabularInline):
+    model = models.Imagenes
+    fields = ('photo',)
+
+    def save_model(self, request, obj, form, change):
+        import pdb; pdb.set_trace()
+        a = 1
+
+
+class UserAdmin(BaseUserAdmin):
+    ordering = ['id']
+    list_display = ['email', 'name']
+    fieldsets = (
+        (None, {'fields': ('email', 'password')}),
+        (_('Personal info'), {'fields': ('name',)}),
+        (
+            _('Permissions'),
+            {'fields': ('is_active', 'is_staff', 'is_superuser')}
+        ),
+        (_('Important dates'), {'fields': ('last_login',)}),
+    )
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('email', 'password1', 'password2')
+        }),
+    )
+
+
+@admin.register(models.Inmueble)
+class InmuebleAdmin(admin.ModelAdmin):
+    inlines = [ImagenesInmuebleInline,]
+
+admin.site.register(models.User, UserAdmin)
+admin.site.register(models.Dueno)
+admin.site.register(models.Categoria)
+admin.site.register(models.Estado)
+admin.site.register(models.Municipio)
+admin.site.register(models.TipoPropiedad)
+admin.site.register(models.PrecioPeriodo)
