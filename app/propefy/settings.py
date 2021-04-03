@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'apps.core',
     'apps.user',
+    'apps.inmueble',
     'drf_yasg',
     'storages',
     'django_celery_results',
@@ -143,6 +144,11 @@ STATICFILES_DIRS = [
 AUTH_USER_MODEL = 'core.User'
 
 CELERY_BROKER_URL = 'pyamqp://rabbitmq:5672'
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 10,
+}
 
 SWAGGER_SETTINGS = {
     'USE_SESSION_AUTH': False,

@@ -4,7 +4,6 @@ import uuid
 from django.utils.translation import gettext_lazy as _
 from django.core.files.base import ContentFile
 from django.conf import settings
-import geocoder
 
 
 def get_file_name():
@@ -86,19 +85,6 @@ def cleaned_base_64(base64_image):
         return base64_image.split('base64,')[1]
     except Exception:
         return base64_image
-
-
-def reverse_geolocaion(lat: float, lng: float) -> str:
-    latlng = [lat, lng]
-    g = geocoder.mapbox(latlng, method='reverse', key=settings.MAPBOX_TOKEN)
-    raw_data = g.json.get('raw')
-    if not raw_data:
-        return "Unverified"
-    place = raw_data.get('place')
-    region = raw_data.get('region')
-    country = raw_data.get('country')
-    location = f'{place}, {region}, {country}'
-    return location
 
 
 class CreateListModelMixin(object):

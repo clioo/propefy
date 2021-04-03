@@ -3,6 +3,7 @@ import binascii
 import imghdr
 import io
 import uuid
+from PIL import Image
 
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
@@ -34,6 +35,17 @@ class Base64FieldMixin(object):
         self.represent_in_base64 = kwargs.pop('represent_in_base64', False)
         super(Base64FieldMixin, self).__init__(*args, **kwargs)
 
+    def obtain_optimized_image(self, decoded_file, complete_file_name,
+                               file_extension) -> ContentFile:
+        buf = io.BytesIO(decoded_file)
+        img = Image.open(buf)
+        img.thumbnail(self.max_image_size)
+        img_byte_arr = io.BytesIO()
+        if file_extension == 'jpg':
+            file_extension = 'jpeg'
+        img.save(img_byte_arr, format=file_extension)
+        return ContentFile(img_byte_arr.getvalue(), name=complete_file_name)
+
     def to_internal_value(self, base64_data):
         # Check if this is a base64 string
         if base64_data in self.EMPTY_VALUES:
@@ -56,7 +68,9 @@ class Base64FieldMixin(object):
             if file_extension not in self.ALLOWED_TYPES:
                 raise ValidationError(self.INVALID_TYPE_MESSAGE)
             complete_file_name = file_name + "." + file_extension
-            data = ContentFile(decoded_file, name=complete_file_name)
+            data = self.obtain_optimized_image(decoded_file,
+                                               complete_file_name,
+                                               file_extension)
             return super(Base64FieldMixin, self).to_internal_value(data)
         raise ValidationError(_('Invalid type. This is not an base64 string: {}'.format(
             type(base64_data))))
@@ -118,6 +132,14 @@ class Base64ImageField(Base64FieldMixin, ImageField):
 
         extension = "jpg" if extension == "jpeg" else extension
         return extension
+
+
+class HdBase64ImageField(Base64ImageField):
+    max_image_size = (1080, 1080)
+
+
+class ThumbnailBase64ImageField(Base64ImageField):
+    max_image_size = (100, 100)
 
 
 class CurrentUserDefault(object):
