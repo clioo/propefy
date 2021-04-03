@@ -20,8 +20,6 @@ def create_user(**params):
         params['email'] = get_random_username() + '@test.com'
     if not params.get('password'):
         params['password'] = 'test123'
-    if not params.get('username'):
-        params['username'] = get_random_username()
     if not params.get('phone'):
         params['phone'] = get_random_phone()
     return get_user_model().objects.create_user(
@@ -55,7 +53,6 @@ class PrivateApiUserProfile(TestCase):
     def setUp(self):
         payload = {
             'email': 'test1@test3.com',
-            'username': 'testusername3',
             'phone': '+526681596075',
             'password': 'password12345',
             'name': 'rodolfo'
@@ -68,4 +65,3 @@ class PrivateApiUserProfile(TestCase):
         """Test that a token is created for the user"""
         response = self.client.get(ME_URL)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertNotIn('token', response.data)
