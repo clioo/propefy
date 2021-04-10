@@ -51,7 +51,7 @@ services:
       - main
     restart: on-failure
     volumes: 
-     - app:/app
+     - ./app:/app
 
   redis:
     image: redis:latest
@@ -79,6 +79,3 @@ services:
 
 networks:
   main:
-
-volumes:
-  app:
