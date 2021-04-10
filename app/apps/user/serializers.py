@@ -22,7 +22,7 @@ class UserSerializer(serializers.ModelSerializer):
                         'token': {'read_only': True}}
 
     def get_token(self, user):
-        token = Token.objects.create(user=user)
+        token, created = Token.objects.get_or_create(user=user)
         return token.key
 
     def create(self, validated_data):
