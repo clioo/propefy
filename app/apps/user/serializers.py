@@ -8,6 +8,7 @@ from django.utils.encoding import force_bytes, force_text
 from django.core.mail import EmailMessage
 from rest_framework.authtoken.models import Token
 from django.conf import settings
+from apps.utils.tasks import send_email_template
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -31,17 +32,17 @@ class UserSerializer(serializers.ModelSerializer):
         user = get_user_model().objects.create_user(**validated_data)
         current_site = settings.FRONTEND_BASE_URL
         mail_subject = 'Activa tu cuenta propefy'
-        message = render_to_string('acc_active_email.html', {
+        to_email = validated_data.get('email')
+        context = {
             'user': validated_data.get('name'),
             'domain': current_site,
             'uid':urlsafe_base64_encode(force_bytes(user.pk)),
             'token':account_activation_token.make_token(user),
-        })
-        to_email = validated_data.get('email')
-        email = EmailMessage(
-                    mail_subject, message, to=[to_email]
+        }
+        send_email_template.delay(
+            mail_subject=mail_subject, to=[to_email],
+            context=context, template_name='registration_email.html'
         )
-        email.send()
         return user
 
     def update(self, instance, validated_data):
@@ -76,3 +77,19 @@ class AuthTokenSerializer(serializers.Serializer):
             raise serializers.ValidationError(msg, code='authentication')
         attrs['user'] = user
         return attrs
+
+
+class RecoveryPasswordSerializer(serializers.Serializer):
+    token = serializers.CharField(required=True)
+    uidb64 = serializers.CharField(required=True)
+    password = serializers.CharField(
+        required=True,
+        trim_whitespace=False,
+        style={'input_type': 'password'},
+        min_length=5,
+        max_length=18
+    )
+
+
+class SendVerificationEmail(serializers.Serializer):
+    email = serializers.CharField(required=True, max_length=13)
