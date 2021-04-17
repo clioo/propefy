@@ -34,7 +34,7 @@ services:
         - redis
 
   celery_worker_utils:
-    command: sh -c "celery -A propefy worker -l info --concurrency=10 -Q utils"
+    command: sh -c "celery -A propefy worker -l info --concurrency=10"
     depends_on:
       - app
       - rabbitmq

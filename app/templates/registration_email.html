@@ -1,0 +1,37 @@
+{% extends "base/base_email.html" %}
+{% load static %}
+
+
+{%block content%}
+    <div class="container" style="background-color: white;">
+        <div class="row  pt-5 justify-content-center" style="text-align: center;">
+            <h5 style="font-weight: 700;">Forgot your Password?</h5>
+        </div>
+        <div class="row justify-content-center" style="text-align: center; font-weight: 400;">
+            <div class="col-10">
+                <p>
+                    To reset your password enter the following link and follow the instructions.
+                </p>
+            </div>
+        </div>
+        <div class="row  justify-content-center mt-3" style="text-align: center;">
+            <div class="col-5">
+                <a href="{{url}}">
+                    <div
+                        style="padding-top: 15px; padding-bottom: 1px; color: white; font-weight: 700; text-decoration:none; text-align: center; background-color: #5ED3A9; border-radius: 12px;">
+                        <p>Reset Password</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="row mt-4 justify-content-center" style="text-align: center; font-weight: 400;">
+            <div class="col-10">
+                <p>
+                    When you reset your password, you will be able to access your account with your email
+                    and your new password or if you didn’t request a new password log in to your Momenry
+                    profile with your current password.
+                </p>
+            </div>
+        </div>
+    </div>
+{%endblock%}
