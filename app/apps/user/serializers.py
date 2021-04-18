@@ -33,11 +33,14 @@ class UserSerializer(serializers.ModelSerializer):
         current_site = settings.FRONTEND_BASE_URL
         mail_subject = 'Activa tu cuenta propefy'
         to_email = validated_data.get('email')
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        token = account_activation_token.make_token(user)
+        url = settings.FRONTEND_RECOVERY_URL.format(base_url=settings.FRONTEND_BASE_URL,
+            uid=uid, token=token)
         context = {
             'user': validated_data.get('name'),
             'domain': current_site,
-            'uid':urlsafe_base64_encode(force_bytes(user.pk)),
-            'token':account_activation_token.make_token(user),
+            'url': url
         }
         send_email_template.delay(
             mail_subject=mail_subject, to=[to_email],

@@ -40,10 +40,10 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'rest_framework.authtoken',
+    'drf_yasg',
     'apps.core',
     'apps.user',
     'apps.inmueble',
-    'drf_yasg',
     'storages',
     'django_celery_results',
     'django_filters'

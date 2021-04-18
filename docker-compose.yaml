@@ -2,7 +2,6 @@ version: '3.4'
 
 services:
   rabbitmq:
-    container_name: rabbitmq
     hostname: rabbitmq
     image: rabbitmq:latest
     networks:
@@ -38,7 +37,6 @@ services:
     depends_on:
       - app
       - rabbitmq
-      - redis
     deploy:
       restart_policy:
         condition: on-failure
@@ -46,7 +44,7 @@ services:
         limits:
           cpus: '0.50'
     hostname: celery_worker_utils
-    image: app-image
+    image: propefy-image
     networks:
       - main
     restart: on-failure
@@ -61,7 +59,7 @@ services:
       - main
 
   # dashboard:
-  #   image: app-image
+  #   image: propefy-image
   #   command:  flower -A propefy --port=5555
   #   networks:
   #     - main
