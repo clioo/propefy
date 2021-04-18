@@ -57,16 +57,35 @@ class TipoPropiedad(models.Model):
 
 class Estado(models.Model):
     nombre = models.CharField(max_length=255, verbose_name="Nombre")
+    cve_entidad = models.CharField(max_length=255, unique=True)
+    nombre_abreviacion = models.CharField(max_length=255)
+
     def __str__(self):
         return self.nombre
 
 
 class Municipio(models.Model):
+    ambitos = (
+        ('U', 'Urbano'),
+        ('R', 'Rural')
+    )
+    cve_municipio = models.IntegerField()
+    ambito = models.CharField(max_length=5, choices=ambitos)
     nombre = models.CharField(max_length=255, verbose_name="Nombre")
     estado = models.ForeignKey('Estado', on_delete=models.PROTECT)
 
     def __str__(self):
         return self.nombre
+
+
+class Localidad(models.Model):
+    municipio = models.ForeignKey('Municipio', on_delete=models.CASCADE)
+    pob_total = models.IntegerField(null=True, blank=True)
+    pob_masculina = models.IntegerField(null=True, blank=True)
+    pob_femenina = models.IntegerField(null=True, blank=True)
+    total_viviendas_habitadas = models.IntegerField(null=True, blank=True)
+    latitude = models.FloatField(null=True, blank=True)
+    longitude = models.FloatField(null=True, blank=True)
 
 
 class PrecioPeriodo(models.Model):
