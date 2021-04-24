@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from apps.core.models import (Inmueble, Imagenes)
+from apps.core.models import (Inmueble, Imagenes, TipoPropiedad, Municipio, Estado)
 from apps.utils.extra_fields import HdBase64ImageField, ThumbnailBase64ImageField
 from apps.user.serializers import UserSerializer
 from apps.utils.extra_fields import RelatedFieldObjectRetriever
@@ -34,3 +34,22 @@ class InmuebleSerializer(serializers.ModelSerializer):
                   'latitud', 'longitud', 'creada', 'actualizada',
                   'imagenes_set')
         extra_kwargs = {'id': {'read_only': True}}
+
+
+class TipoPropiedadSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TipoPropiedad
+        fields = ('id', 'nombre')
+        extra_kwargs = {'id': {'read_only': True}}
+
+
+class MunicipioSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Municipio
+        fields = ('id', 'cve_municipio', 'nombre', 'estado')
+        extra_kwargs = {'id': {'read_only': True}}
+
+class EstadoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Estado
+        fields = ('id', 'nombre', 'cve_entidad', 'nombre_abreviacion')
