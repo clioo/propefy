@@ -59,26 +59,34 @@ class Estado(models.Model):
     nombre = models.CharField(max_length=255, verbose_name="Nombre")
     cve_entidad = models.CharField(max_length=255, unique=True)
     nombre_abreviacion = models.CharField(max_length=255)
+    class Meta:
+        ordering = ('nombre',)
 
     def __str__(self):
         return self.nombre
 
 
 class Municipio(models.Model):
-    ambitos = (
-        ('U', 'Urbano'),
-        ('R', 'Rural')
-    )
     cve_municipio = models.IntegerField()
-    ambito = models.CharField(max_length=5, choices=ambitos)
     nombre = models.CharField(max_length=255, verbose_name="Nombre")
     estado = models.ForeignKey('Estado', on_delete=models.PROTECT)
+
+    class Meta:
+        unique_together = ('cve_municipio', 'estado')
+        ordering = ('nombre',)
 
     def __str__(self):
         return self.nombre
 
 
 class Localidad(models.Model):
+    ambitos = (
+        ('U', 'Urbano'),
+        ('R', 'Rural')
+    )
+    nombre = models.CharField(max_length=255)
+    cve_localidad = models.IntegerField()
+    ambito = models.CharField(max_length=5, choices=ambitos)
     municipio = models.ForeignKey('Municipio', on_delete=models.CASCADE)
     pob_total = models.IntegerField(null=True, blank=True)
     pob_masculina = models.IntegerField(null=True, blank=True)
@@ -103,8 +111,12 @@ class Dueno(models.Model):
     nombre = models.CharField(max_length=255)
     celular = models.CharField(max_length=255)
 
-def __str__(self):
-    return self.nombre
+    class Meta:
+        ordering = ('nombre',)
+
+
+    def __str__(self):
+        return self.nombre
 
 
 class Inmueble(models.Model):
@@ -138,6 +150,7 @@ class Inmueble(models.Model):
     longitud = models.FloatField()
     creada = models.DateTimeField(auto_now_add=True)
     actualizada = models.DateTimeField(auto_now=True)
+    destacado = models.BooleanField(default=False)
 
     def __str__(self):
         return self.titulo
