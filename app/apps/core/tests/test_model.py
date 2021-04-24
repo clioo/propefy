@@ -18,10 +18,17 @@ def sample_tipo_propiedad(nombre='Casa habitación'):
     return models.TipoPropiedad.objects.create(nombre=nombre)
 
 
-def sample_municipio(nombre='Ahome'):
-    estado = models.Estado.objects.create(nombre='Sinaloa')
+def sample_municipio(nombre='Ahome', **kwargs):
+    estado = models.Estado.objects.all()
+    if estado.exists():
+        estado = estado.first()
+    else:
+        estado = models.Estado.objects.create(nombre='Sinaloa',
+                                              cve_entidad='sla',
+                                              nombre_abreviacion='asd')
     return models.Municipio.objects.create(estado=estado,
-                                           nombre=nombre)
+                                           nombre=nombre,
+                                           **kwargs)
 
 
 def sample_precio_periodo(nombre='Mensual'):
@@ -64,7 +71,7 @@ class ModelTests(TestCase):
         """Test creating a new property"""
         categoria = sample_categoria()
         tipo = sample_tipo_propiedad(nombre='Renta')
-        municipio = sample_municipio()
+        municipio = sample_municipio(cve_municipio='12')
         titulo = 'Vivienda de dos recamaras'
         descripcion = """
         Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
@@ -96,7 +103,7 @@ class ModelTests(TestCase):
         """Test creating a new property"""
         categoria = sample_categoria('Renta')
         tipo = sample_tipo_propiedad(nombre='Vivienda')
-        municipio = sample_municipio()
+        municipio = sample_municipio(cve_municipio='12')
         titulo = 'Vivienda de dos recamaras'
         precio_periodo = sample_precio_periodo()
         descripcion = """
