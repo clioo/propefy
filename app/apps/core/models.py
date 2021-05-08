@@ -8,6 +8,20 @@ import os.path
 from PIL import Image
 from io import BytesIO
 from django.core.files.base import ContentFile
+from django.contrib.postgres.search import SearchQuery, SearchVector, SearchVectorField, TrigramSimilarity
+from django.contrib.contenttypes.fields import GenericRelation
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.gis.db import models as gis_models
+from django.contrib.gis.geos import Point
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+
+class GenericModel(models.Model):
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')
 
 
 class UserManager(BaseUserManager):
@@ -39,6 +53,21 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     objects = UserManager()
     USERNAME_FIELD = 'email'
+
+
+class Like(GenericModel):
+    user = models.ForeignKey(
+        'User',
+        on_delete=models.CASCADE
+    )
+    created = models.DateTimeField(auto_now_add=True)
+
+
+class Likable(models.Model):
+    likes = GenericRelation(Like)
+
+    class Meta:
+        abstract = True
 
 
 class Categoria(models.Model):
@@ -96,6 +125,22 @@ class Localidad(models.Model):
     longitude = models.FloatField(null=True, blank=True)
 
 
+class Asentamiento(models.Model):
+    name = models.CharField(max_length=255, verbose_name="d_asenta")
+    tipo_asentamiento = models.CharField(max_length=255, verbose_name="d_tipo_asenta")
+    zona = models.CharField(max_length=255, verbose_name="d_zona")
+    ciudad = models.CharField(max_length=255, verbose_name="ciudad")
+    codigo_postal = models.CharField(max_length=5, verbose_name='d_codigo')
+    municipio = models.ForeignKey('Municipio', on_delete=models.CASCADE)
+    id_asenta_cp = models.CharField(max_length=255, verbose_name="id_asenta_cpcons")
+    
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        unique_together = ('id_asenta_cp', 'codigo_postal')
+
+
 class PrecioPeriodo(models.Model):
     nombre = models.CharField(max_length=255, verbose_name="Precio periodo")
 
@@ -119,7 +164,7 @@ class Dueno(models.Model):
         return self.nombre
 
 
-class Inmueble(models.Model):
+class Inmueble(Likable):
     status_choices = [
         ('a', 'En venta'),
         ('v', 'Vendida',),
@@ -151,6 +196,12 @@ class Inmueble(models.Model):
     creada = models.DateTimeField(auto_now_add=True)
     actualizada = models.DateTimeField(auto_now=True)
     destacado = models.BooleanField(default=False)
+    search_vector = SearchVectorField(null=True)
+    point = gis_models.PointField(geography=True)
+
+    def save(self, **kwargs):
+        self.point = Point(self.latitud, self.longitud)
+        super().save(**kwargs)
 
     def __str__(self):
         return self.titulo
@@ -199,3 +250,24 @@ class Imagenes(models.Model):
         temp_thumb.close()
 
         return True
+
+
+class HistorialVisitas(models.Model):
+    user = models.ForeignKey('User', on_delete=models.CASCADE, blank=True, null=True)
+    inmueble = models.ForeignKey('Inmueble', on_delete=models.CASCADE)
+    created = models.DateTimeField(auto_now_add=True)
+
+
+@receiver(post_save, sender=Inmueble)
+def inmueble_post_save(sender, instance, created, *args, **kwargs):
+    """Argument explanation:
+
+       sender - The model class. (MyModel)
+       instance - The actual instance being saved.
+       created - Boolean; True if a new record was created.
+
+       *args, **kwargs - Capture the unneeded `raw` and `using`(1.3) arguments.
+    """
+    if created:
+        instance.search_vector = SearchVector('titulo', 'descripcion', 'direccion')
+        instance.save()
