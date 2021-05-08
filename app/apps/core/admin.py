@@ -36,6 +36,7 @@ class UserAdmin(BaseUserAdmin):
 @admin.register(models.Inmueble)
 class InmuebleAdmin(admin.ModelAdmin):
     inlines = [ImagenesInmuebleInline,]
+    exclude = ['search_vector', 'point']
 
 admin.site.register(models.User, UserAdmin)
 admin.site.register(models.Dueno)
