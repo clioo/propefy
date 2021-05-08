@@ -12,6 +12,7 @@ from apps.utils.utils import CreateListModelMixin
 from django.contrib.gis.geos import Point
 from django.contrib.gis.db.models.functions import Distance
 from rest_framework.response import Response
+from apps.utils.extra_fields import PatchModelMixin
 
 
 class BaseInmuebleViewSet(viewsets.GenericViewSet,
@@ -26,6 +27,7 @@ class BaseInmuebleViewSet(viewsets.GenericViewSet,
 class InmuebleViewSet(viewsets.GenericViewSet,
                       mixins.ListModelMixin,
                       mixins.RetrieveModelMixin):
+    authentication_classes = (authentication.TokenAuthentication,)
     filter_backends = (filters.DjangoFilterBackend,)
     filterset_class = InmuebleFilter
     serializer_class = InmuebleSerializer
@@ -96,3 +98,39 @@ class MunicipioViewSet(viewsets.GenericViewSet,
     filterset_class = MunicipioFilter
     serializer_class = MunicipioSerializer
     queryset = Municipio.objects.all()
+
+
+class InmuebleLikeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin,
+                          PatchModelMixin):
+    serializer_class = InmuebleSerializer
+    authentication_classes = (authentication.TokenAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+    queryset = Inmueble.objects.all()
+
+    def partial_update(self, request, *args, **kwargs):
+        partial = True
+        instance = self.get_object()
+        # creating o removing like
+        likes = instance.likes.filter(user=self.request.user)
+        if likes:
+            for like in likes:
+                instance.likes.remove(like)
+                like.delete()
+        else:
+            instance.likes.create(user=self.request.user)
+        # ***
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        if getattr(instance, '_prefetched_objects_cache', None):
+            # If 'prefetch_related' has been applied to a queryset, we need to
+            # forcibly invalidate the prefetch cache on the instance.
+            instance._prefetched_objects_cache = {}
+
+        return Response(serializer.data)
+
+    def get_queryset(self):
+        if self.action == 'partial_update':
+            return self.queryset
+        return self.queryset.filter(likes__user=self.request.user)
