@@ -43,6 +43,7 @@ class InmuebleSerializer(serializers.ModelSerializer):
         many=True
     )
     distance = serializers.SerializerMethodField(read_only=True)
+    is_liked = serializers.SerializerMethodField(required=False)
 
     class Meta:
         model = Inmueble
@@ -51,7 +52,7 @@ class InmuebleSerializer(serializers.ModelSerializer):
                   'moneda', 'precio_periodo', 'status', 'estacionamientos',
                   'recamaras', 'banos', 'medios_banos', 'direccion',
                   'latitud', 'longitud', 'creada', 'actualizada',
-                  'imagenes_set', 'distance')
+                  'imagenes_set', 'distance', 'is_liked')
         extra_kwargs = {'id': {'read_only': True}}
 
     def get_distance(self, instance):
@@ -61,6 +62,12 @@ class InmuebleSerializer(serializers.ModelSerializer):
             return "Distancia no disponible."
         return calculate_distance(instance.latitude, instance.longitude,
                                   float(user_lat), float(user_lon))
+
+    def get_is_liked(self, instance):
+        if not self.context['request'].user.is_anonymous:
+            return instance.likes.filter(
+                user_id=self.context['request'].user.id).exists()
+        return (_('Not authenticated.'))
 
 
 class HistorialVisitasSerializer(serializers.ModelSerializer):

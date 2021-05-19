@@ -14,14 +14,19 @@ from apps.utils.test_utils.utils import get_random_phone, get_random_username
 
 
 INMUEBLES_URL = reverse('inmueble:public-inmuebles-list')
+RANDOM_INMUEBLES_URL = reverse('inmueble:random-inmuebles-list')
 MUNICIPIOS_URL = reverse('inmueble:municipios-list')
 ESTADOS_URL = reverse('inmueble:estados-list')
 TIPO_INMUEBLE_URL = reverse('inmueble:tipo-inmueble-list')
 HISTORIA_INMUEBLE_URL = reverse('inmueble:history-list')
+MY_FAVORITE_INMUEBLES = reverse('inmueble:like-list')
 
 
-def get_detail_inmueble_url(id: int):
+def get_detail_inmueble_url(id: int) -> str:
     return reverse('inmueble:public-inmuebles-detail', args=[id,])
+
+def patch_perform_like_inmueble(_id: int) -> str:
+    return reverse('inmueble:like-detail', args=[_id])
 
 
 def create_inmueble(**params):
@@ -98,6 +103,32 @@ class PublicInmuebleTests(TestCase):
         res = self.client.get(INMUEBLES_URL)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(len(res.data.get('results')), 4)
+
+    def test_list_random_inmueble_simple_success(self):
+        precio_periodo_mensual = sample_precio_periodo(nombre='Mensual')
+        tipo_casa_habitacion = sample_tipo_propiedad(nombre='Casa habitación')
+        tipo_local_comercial = sample_tipo_propiedad(nombre='Locales comerciales')
+        categoria_venta = sample_categoria(nombre='Venta')
+        categoria_renta = sample_categoria(nombre='Renta')
+        municipio_ahome = sample_municipio(nombre='Ahome', cve_municipio='12')
+        municipio_culiacan = sample_municipio(nombre='Culiacán', cve_municipio='13')
+        create_inmueble(tipo_propiedad=tipo_casa_habitacion,
+                        categoria=categoria_venta,
+                        municipio=municipio_ahome, precio=1000000)
+        create_inmueble(tipo_propiedad=tipo_local_comercial,
+                        categoria=categoria_renta,
+                        precio_periodo=precio_periodo_mensual,
+                        municipio=municipio_ahome, precio=10000)
+        create_inmueble(tipo_propiedad=tipo_casa_habitacion,
+                        categoria=categoria_venta,
+                        municipio=municipio_culiacan, precio=2000000)
+        create_inmueble(tipo_propiedad=tipo_local_comercial,
+                        categoria=categoria_renta,
+                        precio_periodo=precio_periodo_mensual,
+                        municipio=municipio_culiacan, precio=15000)
+        res = self.client.get(RANDOM_INMUEBLES_URL, {'limit': 1})
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(res.data.get('results')), 1)
 
     def test_filter_inmueble_success(self):
         precio_periodo_mensual = sample_precio_periodo(nombre='Mensual')
@@ -224,3 +255,44 @@ class PrivateInmuebleTests(TestCase):
         # Retriving history
         res = self.client.get(HISTORIA_INMUEBLE_URL)
         self.assertEqual(len(res.data.get('results')), 1)
+
+    def test_inmueble_like_success(self):
+        precio_periodo_mensual = sample_precio_periodo(nombre='Mensual')
+        tipo_casa_habitacion = sample_tipo_propiedad(nombre='Casa habitación')
+        tipo_local_comercial = sample_tipo_propiedad(nombre='Locales comerciales')
+        categoria_venta = sample_categoria(nombre='Venta')
+        categoria_renta = sample_categoria(nombre='Renta')
+        municipio_ahome = sample_municipio(nombre='Ahome', cve_municipio='12')
+        municipio_culiacan = sample_municipio(nombre='Culiacán',
+                                              cve_municipio='13')
+        inmueble1 = create_inmueble(tipo_propiedad=tipo_casa_habitacion,
+                                    categoria=categoria_venta,
+                                    municipio=municipio_ahome, precio=1000000)
+        inmueble2 = create_inmueble(
+            tipo_propiedad=tipo_local_comercial,
+            categoria=categoria_renta,
+            precio_periodo=precio_periodo_mensual,
+            municipio=municipio_ahome, precio=10000)
+        inmueble3 = create_inmueble(
+            tipo_propiedad=tipo_casa_habitacion,
+            categoria=categoria_venta,
+            municipio=municipio_culiacan, precio=2000000)
+        create_inmueble(
+            tipo_propiedad=tipo_local_comercial,
+            categoria=categoria_renta,
+            precio_periodo=precio_periodo_mensual,
+            municipio=municipio_culiacan, precio=15000)
+        like_url = patch_perform_like_inmueble(inmueble1.id)
+        like_url_inmueble_2 = patch_perform_like_inmueble(inmueble2.id)
+        like_url_inmueble_3 = patch_perform_like_inmueble(inmueble3.id)
+        res = self.client.patch(like_url, data={})
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        res = self.client.patch(like_url_inmueble_2, data={})
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        res = self.client.patch(like_url_inmueble_3, data={})
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        liked_inmueble = models.Inmueble.objects.get(id=inmueble1.id)
+        likes = liked_inmueble.likes.all()
+        self.assertEqual(len(likes), 1)
+        res = self.client.get(MY_FAVORITE_INMUEBLES)
+        self.assertEqual(len(res.data.get('results')), 3)
