@@ -12,10 +12,10 @@ class InmuebleFilter(filters.FilterSet):
         model = Inmueble
         fields = ('titulo', 'descripcion', 'dueno', 'acepta_credito',
                   'categoria', 'tipo_propiedad', 'municipio', 'precio',
-                   'moneda', 'precio_periodo', 'status', 'estacionamientos',
-                   'banos', 'medios_banos', 'direccion',
-                   'latitud', 'longitud', 'creada', 'actualizada',
-                   'precio_min', 'precio_max', 'recamaras', 'full_text')
+                  'moneda', 'precio_periodo', 'status', 'estacionamientos',
+                  'banos', 'medios_banos', 'direccion',
+                  'latitud', 'longitud', 'creada', 'actualizada',
+                  'precio_min', 'precio_max', 'recamaras', 'full_text')
 
 
 class MunicipioFilter(filters.FilterSet):
