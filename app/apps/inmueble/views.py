@@ -36,7 +36,7 @@ class InmuebleViewSet(viewsets.GenericViewSet,
     def get_queryset(self):
         longitude = self.request.query_params.get('longitude', 0)
         latitude = self.request.query_params.get('latitude', 0)
-        if self.request.query_params.get('longitude', 0) != 0:
+        if self.request.query_params.get('longitude', 0) == 0:
             return super().get_queryset()
         user_location = Point(float(latitude), float(longitude), srid=4326)
         dataset = self.queryset.annotate(
@@ -65,11 +65,12 @@ class HistorialViewSet(BaseInmuebleViewSet):
 
 class RandomInmueblesViewSet(viewsets.GenericViewSet,
                              mixins.ListModelMixin):
+    """Devuelve solo los inmuebles destacados al azar."""
     serializer_class = InmuebleSerializer
     queryset = Inmueble.objects.all()
 
     def get_queryset(self):
-        return self.queryset.order_by('?')    
+        return self.queryset.filter(destacado=True).order_by('?')    
 
 
 class ImagenesInmuebleViewSet(viewsets.GenericViewSet,
