@@ -30,4 +30,5 @@ urlpatterns = [
             name='schema-swagger-ui'),
     re_path(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0),
             name='schema-redoc'),
+    re_path(r'^auth/', include('rest_framework_social_oauth2.urls')),
 ]

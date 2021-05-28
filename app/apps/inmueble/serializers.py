@@ -60,7 +60,7 @@ class InmuebleSerializer(serializers.ModelSerializer):
         user_lon = self.context['request'].query_params.get('longitude', 0)
         if user_lat == 0:
             return "Distancia no disponible."
-        return calculate_distance(instance.latitude, instance.longitude,
+        return calculate_distance(instance.latitud, instance.longitud,
                                   float(user_lat), float(user_lon))
 
     def get_is_liked(self, instance):

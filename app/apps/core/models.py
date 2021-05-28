@@ -225,7 +225,7 @@ class Imagenes(models.Model):
     def make_thumbnail(self):
 
         image = Image.open(self.photo)
-        image.thumbnail((100, 100), Image.ANTIALIAS)
+        image.thumbnail((400, 400), Image.ANTIALIAS)
 
         thumb_name, thumb_extension = os.path.splitext(self.photo.name)
         thumb_extension = thumb_extension.lower()
