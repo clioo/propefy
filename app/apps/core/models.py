@@ -133,7 +133,8 @@ class Asentamiento(models.Model):
     codigo_postal = models.CharField(max_length=5, verbose_name='d_codigo')
     municipio = models.ForeignKey('Municipio', on_delete=models.CASCADE)
     id_asenta_cp = models.CharField(max_length=255, verbose_name="id_asenta_cpcons")
-    
+    polygon = gis_models.MultiPolygonField(blank=True, null=True)
+
     def __str__(self):
         return self.name
 
