@@ -18,6 +18,14 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 
+class BaseModel(models.Model):
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+    is_active = models.BooleanField(default=True)
+    class Meta:
+        abstract = True
+
+
 class GenericModel(models.Model):
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
@@ -340,3 +348,13 @@ def inmueble_post_save(sender, instance, created, *args, **kwargs):
     if created:
         instance.search_vector = SearchVector('titulo', 'descripcion', 'direccion')
         instance.save()
+
+
+class ProspectoVendedor(BaseModel):
+    """Son quienes quieren vender su propiedad sin registrarse."""
+    interested_phone_number = models.CharField(max_length=10)
+
+
+class ProspectoComprador(BaseModel):
+    """Son quienes deciden comprar sin registrarse"""
+    interested_phone_number = models.CharField(max_length=10)

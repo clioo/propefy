@@ -20,13 +20,24 @@ ESTADOS_URL = reverse('inmueble:estados-list')
 TIPO_INMUEBLE_URL = reverse('inmueble:tipo-inmueble-list')
 HISTORIA_INMUEBLE_URL = reverse('inmueble:history-list')
 MY_FAVORITE_INMUEBLES = reverse('inmueble:like-list')
+PROSPECTO_COMPRADOR = reverse('inmueble:prospecto-comprador-list')
+PROSPECTO_VENDEDOR = reverse('inmueble:prospecto-vendedor-list')
 
 
 def get_detail_inmueble_url(id: int) -> str:
     return reverse('inmueble:public-inmuebles-detail', args=[id,])
 
+
 def patch_perform_like_inmueble(_id: int) -> str:
     return reverse('inmueble:like-detail', args=[_id])
+
+
+def get_detail_prospecto_comprador_url(_id: int) -> str:
+    return reverse('inmueble:prospecto-comprador-detail', args=[_id])
+
+
+def get_detail_prospecto_vendedor_url(_id: int) -> str:
+    return reverse('inmueble:prospecto-vendedor-detail', args=[_id])
 
 
 def create_inmueble(**params):
@@ -296,3 +307,45 @@ class PrivateInmuebleTests(TestCase):
         self.assertEqual(len(likes), 1)
         res = self.client.get(MY_FAVORITE_INMUEBLES)
         self.assertEqual(len(res.data.get('results')), 3)
+
+
+class ProspectoTests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = sample_user()
+        self.client.force_authenticate(self.user)
+
+    def test_prospecto_compra_create_success(self):
+        self.client.logout()
+        res = self.client.post(PROSPECTO_COMPRADOR, {
+            'interested_phone_number': '6681596072'
+        })
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+    def test_prospecto_compra_list_normal_user_error(self):
+        self.client.logout()
+        res = self.client.get(PROSPECTO_COMPRADOR)
+        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_prospecto_compra_retrieve_normal_user_error(self):
+        self.client.logout()
+        pros = models.ProspectoComprador.objects.create(
+            interested_phone_number='6681596072')
+        url = get_detail_prospecto_comprador_url(pros.id)
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_prospecto_compra_list_admin_user_success(self):
+        user = sample_user(email='test1@test.com', is_staff=True)
+        self.client.force_authenticate(user)
+        res = self.client.get(PROSPECTO_COMPRADOR)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+    def test_prospecto_compra_retrieve_admin_user_success(self):
+        user = sample_user(email='test1@test.com', is_staff=True)
+        self.client.force_authenticate(user)
+        pros = models.ProspectoComprador.objects.create(
+            interested_phone_number='6681596072')
+        url = get_detail_prospecto_comprador_url(pros.id)
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)

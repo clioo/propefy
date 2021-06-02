@@ -2,9 +2,12 @@ from rest_framework import (authentication, permissions, viewsets,
                             mixins)
 from .serializers import (InmuebleSerializer, ImagenesSerializer,
                           TipoPropiedadSerializer, MunicipioSerializer,
-                          EstadoSerializer, HistorialVisitasSerializer)
+                          EstadoSerializer, HistorialVisitasSerializer,
+                          ProspectoVendedorSerializer,
+                          ProspectoCompradorSerializer)
 from apps.core.models import (Estado, Inmueble, Imagenes, Municipio,
-                              TipoPropiedad, HistorialVisitas)
+                              TipoPropiedad, HistorialVisitas,
+                              ProspectoVendedor, ProspectoComprador)
 from django.utils.translation import gettext_lazy as _
 from django_filters import rest_framework as filters
 from .filters import InmuebleFilter, MunicipioFilter
@@ -36,7 +39,7 @@ class InmuebleViewSet(viewsets.GenericViewSet,
     def get_queryset(self):
         longitude = self.request.query_params.get('longitude', 0)
         latitude = self.request.query_params.get('latitude', 0)
-        if self.request.query_params.get('longitude', 0) == 0:
+        if longitude == 0:
             return super().get_queryset()
         user_location = Point(float(latitude), float(longitude), srid=4326)
         dataset = self.queryset.annotate(
@@ -65,12 +68,19 @@ class HistorialViewSet(BaseInmuebleViewSet):
 
 class RandomInmueblesViewSet(viewsets.GenericViewSet,
                              mixins.ListModelMixin):
-    """Devuelve solo los inmuebles destacados al azar."""
     serializer_class = InmuebleSerializer
     queryset = Inmueble.objects.all()
 
     def get_queryset(self):
-        return self.queryset.filter(destacado=True).order_by('?')    
+        longitude = self.request.query_params.get('longitude', 0)
+        latitude = self.request.query_params.get('latitude', 0)
+        if longitude == 0:
+            return super().get_queryset()
+        user_location = Point(float(latitude), float(longitude), srid=4326)
+        dataset = self.queryset.annotate(
+            distance=Distance('point', user_location)
+        ).order_by('distance')
+        return dataset
 
 
 class ImagenesInmuebleViewSet(viewsets.GenericViewSet,
@@ -135,3 +145,29 @@ class InmuebleLikeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin,
         if self.action == 'partial_update':
             return self.queryset
         return self.queryset.filter(likes__user=self.request.user)
+
+
+class ProspectoVendedorViewSet(BaseInmuebleViewSet):
+    permission_classes = []
+    queryset = ProspectoVendedor.objects.all()
+    serializer_class = ProspectoVendedorSerializer
+
+    def get_permissions(self):
+        permissions_ = super().get_permissions()
+        if self.action in ['list', 'retrieve', 'update', 'destroy']:
+            permissions_ = (permissions.IsAuthenticated(),
+                            permissions.IsAdminUser())
+        return permissions_
+
+
+class ProspectoCompradorViewSet(BaseInmuebleViewSet):
+    permission_classes = []
+    queryset = ProspectoComprador.objects.all()
+    serializer_class = ProspectoCompradorSerializer
+
+    def get_permissions(self):
+        permissions_ = super().get_permissions()
+        if self.action in ['list', 'retrieve', 'update', 'destroy']:
+            permissions_ = (permissions.IsAuthenticated(),
+                            permissions.IsAdminUser())
+        return permissions_

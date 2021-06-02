@@ -12,6 +12,8 @@ router.register('inmuebles/history', views.HistorialViewSet, 'history')
 router.register('public/tipo-inmueble', views.TipoInmuebleViewSet, 'tipo-inmueble')
 router.register('public/municipios', views.MunicipioViewSet, 'municipios')
 router.register('public/estados', views.EstadoViewSet, 'estados')
+router.register('prospecto/comprador', views.ProspectoCompradorViewSet, 'prospecto-comprador')
+router.register('prospecto/vendedor', views.ProspectoVendedorViewSet, 'prospecto-vendedor')
 
 
 urlpatterns = []
