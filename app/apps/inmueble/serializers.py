@@ -52,7 +52,7 @@ class InmuebleSerializer(serializers.ModelSerializer):
                   'moneda', 'precio_periodo', 'status', 'estacionamientos',
                   'recamaras', 'banos', 'medios_banos', 'direccion',
                   'latitud', 'longitud', 'creada', 'actualizada',
-                  'imagenes_set', 'distance', 'is_liked')
+                  'imagenes_set', 'distance', 'is_liked', 'destacado')
         extra_kwargs = {'id': {'read_only': True}}
 
     def get_distance(self, instance):
