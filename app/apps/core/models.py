@@ -54,6 +54,15 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
     USERNAME_FIELD = 'email'
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['email']),
+            models.Index(fields=['name']),
+            models.Index(fields=['last_name']),
+            models.Index(fields=['phone']),
+            models.Index(fields=['email', 'is_active']),
+        ]
+
 
 class Like(GenericModel):
     user = models.ForeignKey(
@@ -76,12 +85,21 @@ class Categoria(models.Model):
     def __str__(self):
         return self.nombre
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['nombre']),
+        ]
 
 class TipoPropiedad(models.Model):
     nombre = models.CharField(max_length=255,verbose_name="Tipo")
 
     def __str__(self):
         return self.nombre
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['nombre']),
+        ]
 
 
 class Estado(models.Model):
@@ -90,6 +108,10 @@ class Estado(models.Model):
     nombre_abreviacion = models.CharField(max_length=255)
     class Meta:
         ordering = ('nombre',)
+        indexes = [
+            models.Index(fields=['nombre']),
+            models.Index(fields=['nombre', 'cve_entidad']),
+        ]
 
     def __str__(self):
         return self.nombre
@@ -103,6 +125,10 @@ class Municipio(models.Model):
     class Meta:
         unique_together = ('cve_municipio', 'estado')
         ordering = ('nombre',)
+        indexes = [
+            models.Index(fields=['nombre']),
+            models.Index(fields=['nombre', 'cve_municipio']),
+        ]
 
     def __str__(self):
         return self.nombre
@@ -124,6 +150,12 @@ class Localidad(models.Model):
     latitude = models.FloatField(null=True, blank=True)
     longitude = models.FloatField(null=True, blank=True)
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['nombre']),
+            models.Index(fields=['nombre', 'cve_localidad']),
+        ]
+
 
 class Asentamiento(models.Model):
     name = models.CharField(max_length=255, verbose_name="d_asenta")
@@ -140,6 +172,14 @@ class Asentamiento(models.Model):
 
     class Meta:
         unique_together = ('id_asenta_cp', 'codigo_postal')
+        indexes = [
+            models.Index(fields=['name']),
+            models.Index(fields=['tipo_asentamiento']),
+            models.Index(fields=['zona']),
+            models.Index(fields=['ciudad']),
+            models.Index(fields=['codigo_postal']),
+            models.Index(fields=['municipio']),
+        ]
 
 
 class PrecioPeriodo(models.Model):
@@ -147,6 +187,11 @@ class PrecioPeriodo(models.Model):
 
     def __str__(self):
         return self.nombre
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['nombre']),
+        ]
 
 
 class Amenidades(models.Model):
@@ -159,7 +204,10 @@ class Dueno(models.Model):
 
     class Meta:
         ordering = ('nombre',)
-
+        indexes = [
+            models.Index(fields=['nombre']),
+            models.Index(fields=['celular']),
+        ]
 
     def __str__(self):
         return self.nombre
@@ -207,6 +255,27 @@ class Inmueble(Likable):
     def __str__(self):
         return self.titulo
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['titulo']),
+            models.Index(fields=['descripcion']),
+            models.Index(fields=['dueno']),
+            models.Index(fields=['acepta_credito']),
+            models.Index(fields=['categoria']),
+            models.Index(fields=['tipo_propiedad']),
+            models.Index(fields=['municipio']),
+            models.Index(fields=['precio']),
+            models.Index(fields=['moneda']),
+            models.Index(fields=['precio_periodo']),
+            models.Index(fields=['status']),
+            models.Index(fields=['estacionamientos']),
+            models.Index(fields=['recamaras']),
+            models.Index(fields=['banos']),
+            models.Index(fields=['medios_banos']),
+            models.Index(fields=['direccion']),
+            models.Index(fields=['search_vector']),
+        ]
+
 
 class Imagenes(models.Model):
     inmueble = models.ForeignKey('Inmueble', on_delete=models.CASCADE)
@@ -249,7 +318,6 @@ class Imagenes(models.Model):
         # set save=False, otherwise it will run in an infinite loop
         self.thumbnail.save(thumb_filename, ContentFile(temp_thumb.read()), save=False)
         temp_thumb.close()
-
         return True
 
 
