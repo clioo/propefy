@@ -12,10 +12,23 @@ services:
       - ./envs/local.env
     ports:
       - "8000:8000"
+    environment:
+      - DB_HOST=db
+      - DB_NAME=app
+      - DB_USER=postgres
+      - DB_PASS=supersecretpassword
+      - DB_PORT=5432
+    depends_on: 
+      - rabbitmq
+      - redis
+      - db
 
-  # db:
-  #   image: mdillon/postgis
-  #   environment: 
-  #       - POSTGRES_DB=momenry
-  #       - POSTGRES_USER=postgres
-  #       - POSTGRES_PASSWORD=supersecretpassword
+
+  db:
+    image: postgis/postgis
+    networks:
+      - main
+    environment: 
+        - POSTGRES_DB=app
+        - POSTGRES_USER=postgres
+        - POSTGRES_PASSWORD=supersecretpassword

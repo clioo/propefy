@@ -39,12 +39,13 @@ class InmuebleViewSet(viewsets.GenericViewSet,
     def get_queryset(self):
         longitude = self.request.query_params.get('longitude', 0)
         latitude = self.request.query_params.get('latitude', 0)
+        distance = float(self.request.query_params.get('distance', 10000))
         if longitude == 0:
             return super().get_queryset()
         user_location = Point(float(latitude), float(longitude), srid=4326)
         dataset = self.queryset.annotate(
             distance=Distance('point', user_location)
-        ).order_by('distance')
+        ).order_by('distance').filter(distance__lte=distance)
         return dataset
 
     def retrieve(self, request, *args, **kwargs):
