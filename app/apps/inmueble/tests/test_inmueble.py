@@ -197,6 +197,33 @@ class PublicInmuebleTests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(models.HistorialVisitas.objects.count(), 1)
 
+    def test_inmueble_es_privada(self):
+        precio_periodo_mensual = sample_precio_periodo(nombre='Mensual')
+        tipo_casa_habitacion = sample_tipo_propiedad(nombre='Casa habitación')
+        tipo_local_comercial = sample_tipo_propiedad(nombre='Locales comerciales')
+        categoria_venta = sample_categoria(nombre='Venta')
+        categoria_renta = sample_categoria(nombre='Renta')
+        municipio_ahome = sample_municipio(nombre='Ahome', cve_municipio='12')
+        municipio_culiacan = sample_municipio(nombre='Culiacán',
+            cve_municipio='13')
+        create_inmueble(tipo_propiedad=tipo_casa_habitacion,
+                        categoria=categoria_venta, dentro_de_privada=True,
+                        municipio=municipio_ahome, precio=1000000)
+        create_inmueble(tipo_propiedad=tipo_local_comercial,
+                        categoria=categoria_renta,
+                        precio_periodo=precio_periodo_mensual,
+                        municipio=municipio_ahome, precio=10000)
+        create_inmueble(tipo_propiedad=tipo_casa_habitacion,
+                        categoria=categoria_venta,
+                        municipio=municipio_culiacan, precio=2000000)
+        create_inmueble(tipo_propiedad=tipo_local_comercial,
+                        categoria=categoria_renta,
+                        precio_periodo=precio_periodo_mensual,
+                        municipio=municipio_culiacan, precio=15000)
+        res = self.client.get(INMUEBLES_URL, {'dentro_de_privada': True})
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(res.data.get('results')), 1)
+
 
 class PrivateInmuebleTests(TestCase):
     def setUp(self):
