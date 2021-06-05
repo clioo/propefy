@@ -15,7 +15,8 @@ class InmuebleFilter(filters.FilterSet):
                   'moneda', 'precio_periodo', 'status', 'estacionamientos',
                   'banos', 'medios_banos', 'direccion',
                   'latitud', 'longitud', 'creada', 'actualizada',
-                  'precio_min', 'precio_max', 'recamaras', 'full_text')
+                  'precio_min', 'precio_max', 'recamaras', 'full_text',
+                  'dentro_de_privada')
 
 
 class MunicipioFilter(filters.FilterSet):
