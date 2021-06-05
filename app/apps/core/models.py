@@ -253,6 +253,8 @@ class Inmueble(Likable):
     creada = models.DateTimeField(auto_now_add=True)
     actualizada = models.DateTimeField(auto_now=True)
     destacado = models.BooleanField(default=False)
+    dentro_de_privada = models.BooleanField(default=False,
+        verbose_name="¿Está dentro de privada?")
     search_vector = SearchVectorField(null=True)
     point = gis_models.PointField(geography=True)
 
