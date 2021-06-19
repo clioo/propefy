@@ -58,7 +58,7 @@ class InmuebleViewSet(viewsets.GenericViewSet,
                                     **self.request.query_params)
         longitude = self.request.query_params.get('longitude', 0)
         latitude = self.request.query_params.get('latitude', 0)
-        distance = float(self.request.query_params.get('distance', 10)) * 1000000
+        distance = float(self.request.query_params.get('distance', 10)) * 1000
         if longitude == 0:
             return super().get_queryset()
         user_location = Point(float(latitude), float(longitude), srid=4326)
@@ -66,6 +66,7 @@ class InmuebleViewSet(viewsets.GenericViewSet,
             distance=Distance('point', user_location)
         ).order_by('distance').filter(distance__lte=distance)
         return dataset
+
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
