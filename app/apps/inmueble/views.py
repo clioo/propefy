@@ -58,7 +58,7 @@ class InmuebleViewSet(viewsets.GenericViewSet,
                                     **self.request.query_params)
         longitude = self.request.query_params.get('longitude', 0)
         latitude = self.request.query_params.get('latitude', 0)
-        distance = float(self.request.query_params.get('distance', 1000))
+        distance = float(self.request.query_params.get('distance', 10)) * 1000000
         if longitude == 0:
             return super().get_queryset()
         user_location = Point(float(latitude), float(longitude), srid=4326)
