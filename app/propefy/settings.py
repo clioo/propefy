@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+from celery.schedules import crontab
+from celery.schedules import solar
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -45,6 +47,7 @@ INSTALLED_APPS = [
     'apps.user',
     'apps.inmueble',
     'storages',
+    'django_celery_beat',
     'django_celery_results',
     'django_filters',
     'oauth2_provider',
@@ -173,6 +176,15 @@ AUTHENTICATION_BACKENDS = (
     'rest_framework_social_oauth2.backends.DjangoOAuth2',
     'django.contrib.auth.backends.ModelBackend',
 )
+
+
+CELERY_BEAT_SCHEDULE = {
+    'send_recommendation_emails': {
+        'task': 'apps.utils.tasks.send_recommendation_emails',
+        'schedule': solar('dusk_civil', 25.8048, -108.9877),
+    },
+}
+
 
 try:
     from .local_settings import *

@@ -247,6 +247,8 @@ class Inmueble(Likable):
     recamaras = models.IntegerField(verbose_name="recamaras")
     banos = models.IntegerField(verbose_name="Baños")
     medios_banos = models.IntegerField(verbose_name="Medios baños")
+    m_2 = models.FloatField(null=True)
+    m_2_construccion = models.FloatField(null=True)
     direccion = models.CharField(max_length=255)
     latitud = models.FloatField()
     longitud = models.FloatField()
@@ -336,6 +338,27 @@ class HistorialVisitas(models.Model):
     inmueble = models.ForeignKey('Inmueble', on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
 
+
+class HistorialBusquedas(models.Model):
+    user = models.ForeignKey('User', on_delete=models.CASCADE)
+    created = models.DateTimeField(auto_now_add=True)
+    recamaras = models.CharField(max_length=255, null=True)
+    precio_min = models.CharField(max_length=255, null=True)
+    precio_max = models.CharField(max_length=255, null=True)
+    estado = models.CharField(max_length=255, null=True)
+    full_text = models.CharField(max_length=255, null=True)
+    titulo = models.CharField(max_length=255, null=True)
+    descripcion = models.CharField(max_length=255, null=True)
+    categoria = models.CharField(max_length=255, null=True)
+    tipo_propiedad = models.CharField(max_length=255, null=True)
+    latitude = models.FloatField(null=True)
+    longitude = models.FloatField(null=True)
+
+
+class SpamEmail(models.Model):
+    user = models.ForeignKey('User', on_delete=models.CASCADE)
+    created = models.DateTimeField(auto_now_add=True)
+    
 
 @receiver(post_save, sender=Inmueble)
 def inmueble_post_save(sender, instance, created, *args, **kwargs):
