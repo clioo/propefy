@@ -23,13 +23,14 @@ def save_historial_busqueda(user, **kwargs):
     allowed_keys = {'recamaras', 'precio_min', 'precio_max', 'estado',
                     'full_text', 'titulo', 'descripcion', 'categoria',
                     'tipo_propiedad', 'latitude', 'longitude',}
+    data = kwargs.copy()
     for key in kwargs.keys():
-        kwargs[key] = kwargs[key][0]
+        value = kwargs[key][0]
         if key in {'latitude', 'longitude'}:
-            kwargs[key] = float(kwargs[key])
+            data[key] = float(value)
         if key not in allowed_keys:
-            kwargs.pop(key)
-    historialBusquedas = HistorialBusquedas(user=user, **kwargs)
+            data.pop(key)
+    historialBusquedas = HistorialBusquedas(user=user, **data)
     historialBusquedas.save()
 
 
@@ -66,7 +67,6 @@ class InmuebleViewSet(viewsets.GenericViewSet,
             distance=Distance('point', user_location)
         ).order_by('distance').filter(distance__lte=distance)
         return dataset
-
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
