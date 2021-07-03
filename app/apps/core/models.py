@@ -203,7 +203,7 @@ class PrecioPeriodo(models.Model):
 
 
 class Amenidades(models.Model):
-    pass
+    name = models.CharField(max_length=255)
 
 
 class Dueno(models.Model):
@@ -247,8 +247,9 @@ class Inmueble(Likable):
     recamaras = models.IntegerField(verbose_name="recamaras")
     banos = models.IntegerField(verbose_name="Baños")
     medios_banos = models.IntegerField(verbose_name="Medios baños")
-    m_2 = models.FloatField(null=True)
-    m_2_construccion = models.FloatField(null=True)
+    m_2 = models.FloatField(null=True, verbose_name="Metros cuadrados totales")
+    m_2_construccion = models.FloatField(null=True,
+        verbose_name="Metros cuadrados de construcción")
     direccion = models.CharField(max_length=255)
     latitud = models.FloatField()
     longitud = models.FloatField()
@@ -259,6 +260,9 @@ class Inmueble(Likable):
         verbose_name="¿Está dentro de privada?")
     search_vector = SearchVectorField(null=True)
     point = gis_models.PointField(geography=True)
+    se_admiten_mascotas = models.BooleanField(default=True)
+    amueblada = models.BooleanField(default=False)
+    amenidades = models.ManyToManyField('Amenidades')
 
     def save(self, **kwargs):
         self.point = Point(self.latitud, self.longitud)

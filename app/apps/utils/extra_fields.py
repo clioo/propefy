@@ -11,9 +11,23 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework.fields import (ImageField)
 from rest_framework.response import Response
 from rest_framework import serializers
+from django_filters import rest_framework as filters
+from django_filters.constants import EMPTY_VALUES
 
 
 DEFAULT_CONTENT_TYPE = "application/octet-stream"
+
+
+class ListFilter(filters.Filter):
+    def filter(self, qs, value):
+        if value in EMPTY_VALUES:
+            return qs
+        if self.distinct:
+            qs = qs.distinct()
+        lookup = '%s__%s' % (self.field_name, 'in')
+        value = value.split(',')
+        qs = self.get_method(qs)(**{lookup: value})
+        return qs
 
 
 class Base64FieldMixin(object):
