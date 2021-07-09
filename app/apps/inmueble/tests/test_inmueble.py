@@ -232,6 +232,19 @@ class PrivateInmuebleTests(TestCase):
         history = models.HistorialVisitas.objects.first()
         self.assertEqual(history.user.id, self.user.id)
 
+    def test_view_counter_success(self):
+        tipo_casa_habitacion = sample_tipo_propiedad(nombre='Casa habitación')
+        categoria_venta = sample_categoria(nombre='Venta')
+        municipio_ahome = sample_municipio(nombre='Ahome', cve_municipio='12')
+        inmueble1 = create_inmueble(tipo_propiedad=tipo_casa_habitacion,
+                                    categoria=categoria_venta,
+                                    municipio=municipio_ahome, precio=1000000)
+        res = self.client.get(get_detail_inmueble_url(inmueble1.id))
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.data.get('views_counter'), 1)
+        res = self.client.get(get_detail_inmueble_url(inmueble1.id))
+        self.assertEqual(res.data.get('views_counter'), 2)
+
     def test_history_endpoint_success(self):
         precio_periodo_mensual = sample_precio_periodo(nombre='Mensual')
         tipo_casa_habitacion = sample_tipo_propiedad(nombre='Casa habitación')

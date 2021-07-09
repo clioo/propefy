@@ -55,6 +55,8 @@ class InmuebleViewSet(viewsets.GenericViewSet,
             inmueble=instance
         )
         serializer = self.get_serializer(instance)
+        serializer.instance.views_counter += 1
+        serializer.instance.save()
         return Response(serializer.data)
 
 

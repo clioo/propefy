@@ -255,6 +255,7 @@ class Inmueble(Likable):
     destacado = models.BooleanField(default=False)
     search_vector = SearchVectorField(null=True)
     point = gis_models.PointField(geography=True)
+    views_counter = models.PositiveIntegerField(default=0)
 
     def save(self, **kwargs):
         self.point = Point(self.latitud, self.longitud)
