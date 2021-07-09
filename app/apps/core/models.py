@@ -247,6 +247,7 @@ class Inmueble(Likable):
     recamaras = models.IntegerField(verbose_name="recamaras")
     banos = models.IntegerField(verbose_name="Baños")
     medios_banos = models.IntegerField(verbose_name="Medios baños")
+    acepta_mascotas = models.BooleanField(default=False, verbose_name="¿Acepta mascotas?")
     direccion = models.CharField(max_length=255)
     latitud = models.FloatField()
     longitud = models.FloatField()
