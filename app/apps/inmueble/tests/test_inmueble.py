@@ -11,6 +11,7 @@ from apps.core.tests.test_model import (sample_categoria, sample_municipio,
                                         sample_precio_periodo,
                                         sample_user)
 from apps.utils.test_utils.utils import get_random_phone, get_random_username
+from apps.core.models import SpamEmail
 
 
 INMUEBLES_URL = reverse('inmueble:public-inmuebles-list')
@@ -197,6 +198,33 @@ class PublicInmuebleTests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(models.HistorialVisitas.objects.count(), 1)
 
+    def test_inmueble_es_privada(self):
+        precio_periodo_mensual = sample_precio_periodo(nombre='Mensual')
+        tipo_casa_habitacion = sample_tipo_propiedad(nombre='Casa habitación')
+        tipo_local_comercial = sample_tipo_propiedad(nombre='Locales comerciales')
+        categoria_venta = sample_categoria(nombre='Venta')
+        categoria_renta = sample_categoria(nombre='Renta')
+        municipio_ahome = sample_municipio(nombre='Ahome', cve_municipio='12')
+        municipio_culiacan = sample_municipio(nombre='Culiacán',
+            cve_municipio='13')
+        create_inmueble(tipo_propiedad=tipo_casa_habitacion,
+                        categoria=categoria_venta, dentro_de_privada=True,
+                        municipio=municipio_ahome, precio=1000000)
+        create_inmueble(tipo_propiedad=tipo_local_comercial,
+                        categoria=categoria_renta,
+                        precio_periodo=precio_periodo_mensual,
+                        municipio=municipio_ahome, precio=10000)
+        create_inmueble(tipo_propiedad=tipo_casa_habitacion,
+                        categoria=categoria_venta,
+                        municipio=municipio_culiacan, precio=2000000)
+        create_inmueble(tipo_propiedad=tipo_local_comercial,
+                        categoria=categoria_renta,
+                        precio_periodo=precio_periodo_mensual,
+                        municipio=municipio_culiacan, precio=15000)
+        res = self.client.get(INMUEBLES_URL, {'dentro_de_privada': True})
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(res.data.get('results')), 1)
+
 
 class PrivateInmuebleTests(TestCase):
     def setUp(self):
@@ -320,6 +348,56 @@ class PrivateInmuebleTests(TestCase):
         self.assertEqual(len(likes), 1)
         res = self.client.get(MY_FAVORITE_INMUEBLES)
         self.assertEqual(len(res.data.get('results')), 3)
+
+    def test_filter_search_history_inmueble_success(self):
+        precio_periodo_mensual = sample_precio_periodo(nombre='Mensual')
+        tipo_casa_habitacion = sample_tipo_propiedad(nombre='Casa habitación')
+        tipo_local_comercial = sample_tipo_propiedad(nombre='Locales comerciales')
+        categoria_venta = sample_categoria(nombre='Venta')
+        categoria_renta = sample_categoria(nombre='Renta')
+        municipio_ahome = sample_municipio(nombre='Ahome', cve_municipio='12')
+        municipio_culiacan = sample_municipio(nombre='Culiacán', cve_municipio='13')
+        create_inmueble(tipo_propiedad=tipo_casa_habitacion,
+                        categoria=categoria_venta,
+                        municipio=municipio_ahome, precio=1000000)
+        create_inmueble(tipo_propiedad=tipo_local_comercial,
+                        categoria=categoria_renta,
+                        precio_periodo=precio_periodo_mensual,
+                        municipio=municipio_ahome, precio=10000)
+        create_inmueble(tipo_propiedad=tipo_casa_habitacion,
+                        categoria=categoria_venta,
+                        municipio=municipio_culiacan, precio=2000000)
+        create_inmueble(tipo_propiedad=tipo_local_comercial,
+                        categoria=categoria_renta,
+                        precio_periodo=precio_periodo_mensual,
+                        municipio=municipio_culiacan, precio=15000)
+        search_params = {
+            'recamaras': 2,
+            'precio_min': 100000,
+            'precio_max': 50000,
+            'estado': municipio_ahome.estado.id,
+            'full_text': 'this is a full text search',
+            'titulo': 'this is a title',
+            'descripcion': 'this is a description',
+            'categoria': categoria_renta.id,
+            'tipo_propiedad': tipo_local_comercial.id,
+            'latitude': 0.0,
+            'longitude': 0.0
+        }
+        res = self.client.get(INMUEBLES_URL, search_params)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        historial_busqueda = models.HistorialBusquedas.objects.all().first()
+        self.assertIsNotNone(historial_busqueda.recamaras)
+        self.assertIsNotNone(historial_busqueda.precio_min)
+        self.assertIsNotNone(historial_busqueda.precio_max)
+        self.assertIsNotNone(historial_busqueda.estado)
+        self.assertIsNotNone(historial_busqueda.full_text)
+        self.assertIsNotNone(historial_busqueda.titulo)
+        self.assertIsNotNone(historial_busqueda.descripcion)
+        self.assertIsNotNone(historial_busqueda.categoria)
+        self.assertIsNotNone(historial_busqueda.tipo_propiedad)
+        self.assertIsNotNone(historial_busqueda.latitude)
+        self.assertIsNotNone(historial_busqueda.longitude)
 
 
 class ProspectoTests(TestCase):

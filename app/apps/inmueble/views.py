@@ -7,7 +7,8 @@ from .serializers import (InmuebleSerializer, ImagenesSerializer,
                           ProspectoCompradorSerializer)
 from apps.core.models import (Estado, Inmueble, Imagenes, Municipio,
                               TipoPropiedad, HistorialVisitas,
-                              ProspectoVendedor, ProspectoComprador)
+                              ProspectoVendedor, ProspectoComprador,
+                              HistorialBusquedas)
 from django.utils.translation import gettext_lazy as _
 from django_filters import rest_framework as filters
 from .filters import InmuebleFilter, MunicipioFilter
@@ -16,6 +17,21 @@ from django.contrib.gis.geos import Point
 from django.contrib.gis.db.models.functions import Distance
 from rest_framework.response import Response
 from apps.utils.extra_fields import PatchModelMixin
+
+
+def save_historial_busqueda(user, **kwargs):
+    allowed_keys = {'recamaras', 'precio_min', 'precio_max', 'estado',
+                    'full_text', 'titulo', 'descripcion', 'categoria',
+                    'tipo_propiedad', 'latitude', 'longitude',}
+    data = kwargs.copy()
+    for key in kwargs.keys():
+        value = kwargs[key][0]
+        if key in {'latitude', 'longitude'}:
+            data[key] = float(value)
+        if key not in allowed_keys:
+            data.pop(key)
+    historialBusquedas = HistorialBusquedas(user=user, **data)
+    historialBusquedas.save()
 
 
 class BaseInmuebleViewSet(viewsets.GenericViewSet,
@@ -37,14 +53,19 @@ class InmuebleViewSet(viewsets.GenericViewSet,
     queryset = Inmueble.objects.all()
 
     def get_queryset(self):
+        if len(self.request.query_params.keys()) > 2\
+                and not self.request.user.is_anonymous:
+            save_historial_busqueda(self.request.user,
+                                    **self.request.query_params)
         longitude = self.request.query_params.get('longitude', 0)
         latitude = self.request.query_params.get('latitude', 0)
+        distance = float(self.request.query_params.get('distance', 10)) * 1000
         if longitude == 0:
             return super().get_queryset()
         user_location = Point(float(latitude), float(longitude), srid=4326)
         dataset = self.queryset.annotate(
             distance=Distance('point', user_location)
-        ).order_by('distance')
+        ).order_by('distance').filter(distance__lte=distance)
         return dataset
 
     def retrieve(self, request, *args, **kwargs):

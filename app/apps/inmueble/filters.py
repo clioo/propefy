@@ -1,5 +1,6 @@
 from django_filters import rest_framework as filters
 from apps.core.models import Inmueble, Municipio
+from apps.utils.extra_fields import ListFilter
 
 
 class InmuebleFilter(filters.FilterSet):
@@ -8,6 +9,7 @@ class InmuebleFilter(filters.FilterSet):
     precio_max = filters.NumberFilter(field_name='precio', lookup_expr='lte')
     estado = filters.NumberFilter(field_name='municipio__estado')
     full_text = filters.Filter(field_name='search_vector', lookup_expr='icontains')
+    tipo_propiedad = ListFilter(field_name='tipo_propiedad_id')
     class Meta:
         model = Inmueble
         fields = ('titulo', 'descripcion', 'dueno', 'acepta_credito',
@@ -16,7 +18,7 @@ class InmuebleFilter(filters.FilterSet):
                   'banos', 'medios_banos', 'direccion',
                   'latitud', 'longitud', 'creada', 'actualizada',
                   'precio_min', 'precio_max', 'recamaras', 'full_text',
-                  'acepta_mascotas')
+                  'dentro_de_privada', 'se_admiten_mascotas', 'amueblada')
 
 
 class MunicipioFilter(filters.FilterSet):

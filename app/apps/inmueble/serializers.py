@@ -54,16 +54,21 @@ class InmuebleSerializer(serializers.ModelSerializer):
                   'recamaras', 'banos', 'medios_banos', 'direccion',
                   'latitud', 'longitud', 'creada', 'actualizada',
                   'imagenes_set', 'distance', 'is_liked', 'destacado',
-                  'views_counter', 'acepta_mascotas')
+                  'views_counter', 'm_2', 'm_2_construccion', 'se_admiten_mascotas', 'amueblada')
         extra_kwargs = {'id': {'read_only': True}}
 
     def get_distance(self, instance):
-        user_lat = self.context['request'].query_params.get('latitude', 0)
-        user_lon = self.context['request'].query_params.get('longitude', 0)
-        if user_lat == 0:
-            return "Distancia no disponible."
-        return calculate_distance(instance.latitud, instance.longitud,
-                                  float(user_lat), float(user_lon))
+        try:
+            distance = instance.distance.m
+        except:
+            distance = 'Distance not available'
+        return distance
+    #     user_lat = self.context['request'].query_params.get('latitude', 0)
+    #     user_lon = self.context['request'].query_params.get('longitude', 0)
+    #     if user_lat == 0:
+    #         return "Distancia no disponible."
+    #     return calculate_distance(instance.latitud, instance.longitud,
+    #                               float(user_lat), float(user_lon))
 
     def get_is_liked(self, instance):
         if not self.context['request'].user.is_anonymous:

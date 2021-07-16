@@ -12,13 +12,19 @@ services:
       - ./envs/local.env
     ports:
       - "8000:8000"
+    environment:
+      - DB_HOST=db
+      - DB_NAME=app
+      - DB_USER=postgres
+      - DB_PASS=supersecretpassword
+      - DB_PORT=5432
     depends_on: 
       - rabbitmq
       - redis
       - db
 
   db:
-    image: postgres:10-alpine
+    image: postgis/postgis
     networks:
       - main
     environment: 

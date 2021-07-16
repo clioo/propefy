@@ -203,7 +203,7 @@ class PrecioPeriodo(models.Model):
 
 
 class Amenidades(models.Model):
-    pass
+    name = models.CharField(max_length=255)
 
 
 class Dueno(models.Model):
@@ -247,16 +247,23 @@ class Inmueble(Likable):
     recamaras = models.IntegerField(verbose_name="recamaras")
     banos = models.IntegerField(verbose_name="Baños")
     medios_banos = models.IntegerField(verbose_name="Medios baños")
-    acepta_mascotas = models.BooleanField(default=False, verbose_name="¿Acepta mascotas?")
+    m_2 = models.FloatField(null=True, verbose_name="Metros cuadrados totales")
+    m_2_construccion = models.FloatField(null=True,
+        verbose_name="Metros cuadrados de construcción")
     direccion = models.CharField(max_length=255)
     latitud = models.FloatField()
     longitud = models.FloatField()
     creada = models.DateTimeField(auto_now_add=True)
     actualizada = models.DateTimeField(auto_now=True)
     destacado = models.BooleanField(default=False)
+    dentro_de_privada = models.BooleanField(default=False,
+        verbose_name="¿Está dentro de privada?")
     search_vector = SearchVectorField(null=True)
     point = gis_models.PointField(geography=True)
     views_counter = models.PositiveIntegerField(default=0)
+    se_admiten_mascotas = models.BooleanField(default=False, verbose_name="¿Acepta mascotas?")
+    amueblada = models.BooleanField(default=False)
+    amenidades = models.ManyToManyField('Amenidades')
 
     def save(self, **kwargs):
         self.point = Point(self.latitud, self.longitud)
@@ -336,6 +343,27 @@ class HistorialVisitas(models.Model):
     inmueble = models.ForeignKey('Inmueble', on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
 
+
+class HistorialBusquedas(models.Model):
+    user = models.ForeignKey('User', on_delete=models.CASCADE)
+    created = models.DateTimeField(auto_now_add=True)
+    recamaras = models.CharField(max_length=255, null=True)
+    precio_min = models.CharField(max_length=255, null=True)
+    precio_max = models.CharField(max_length=255, null=True)
+    estado = models.CharField(max_length=255, null=True)
+    full_text = models.CharField(max_length=255, null=True)
+    titulo = models.CharField(max_length=255, null=True)
+    descripcion = models.CharField(max_length=255, null=True)
+    categoria = models.CharField(max_length=255, null=True)
+    tipo_propiedad = models.CharField(max_length=255, null=True)
+    latitude = models.FloatField(null=True)
+    longitude = models.FloatField(null=True)
+
+
+class SpamEmail(models.Model):
+    user = models.ForeignKey('User', on_delete=models.CASCADE)
+    created = models.DateTimeField(auto_now_add=True)
+    
 
 @receiver(post_save, sender=Inmueble)
 def inmueble_post_save(sender, instance, created, *args, **kwargs):
