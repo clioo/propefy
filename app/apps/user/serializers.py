@@ -38,13 +38,11 @@ class UserSerializer(serializers.ModelSerializer):
         url = settings.FRONTEND_RECOVERY_URL.format(base_url=settings.FRONTEND_BASE_URL,
             uid=uid, token=token)
         context = {
-            'user': validated_data.get('name'),
-            'domain': current_site,
             'url': url
         }
         send_email_template.delay(
             mail_subject=mail_subject, to=[to_email],
-            context=context, template_name='registration_email.html'
+            context=context, template_name='d-ed314d6cdf44405e872da5c2c4bd296e'
         )
         return user
 
