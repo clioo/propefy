@@ -79,7 +79,7 @@ class SendVerificationEmailView(generics.GenericAPIView):
                     'username': user.name,
                     'url': url
                 },
-                template_name='recovery_password.html'
+                template_name="d-7a2265281aa4483b8c091ed3c4523aff"
             )
             status_code = status.HTTP_200_OK
             message = _('Email sent.')
