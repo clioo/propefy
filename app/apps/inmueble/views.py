@@ -61,7 +61,7 @@ class InmuebleViewSet(viewsets.GenericViewSet,
         latitude = self.request.query_params.get('latitude', 0)
         polygon = self.request.query_params.get('polygon')
         distance = float(self.request.query_params.get('distance', 10)) * 1000
-        if longitude == 0:
+        if longitude == 0 and not polygon:
             return super().get_queryset()
         user_location = Point(float(longitude), float(latitude), srid=4326)
         if polygon:
