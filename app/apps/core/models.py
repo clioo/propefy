@@ -260,13 +260,15 @@ class Inmueble(Likable):
         verbose_name="¿Está dentro de privada?")
     search_vector = SearchVectorField(null=True)
     point = gis_models.PointField(geography=True)
+    point_geometry = gis_models.PointField(geography=False)
     views_counter = models.PositiveIntegerField(default=0)
     se_admiten_mascotas = models.BooleanField(default=False, verbose_name="¿Acepta mascotas?")
     amueblada = models.BooleanField(default=False)
     amenidades = models.ManyToManyField('Amenidades')
 
     def save(self, **kwargs):
-        self.point = Point(self.latitud, self.longitud)
+        self.point = Point(self.longitud, self.latitud)
+        self.point_geometry = Point(self.longitud, self.latitud)
         super().save(**kwargs)
 
     def __str__(self):

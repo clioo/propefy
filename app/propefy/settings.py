@@ -25,7 +25,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = ''
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = []
 
@@ -197,7 +197,7 @@ CELERY_BEAT_SCHEDULE = {
         'schedule': solar('dusk_civil', 25.8048, -108.9877),
     },
 }
-
+EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
 
 try:
     from .local_settings import *

@@ -13,7 +13,7 @@ from django.utils.translation import gettext_lazy as _
 from django_filters import rest_framework as filters
 from .filters import InmuebleFilter, MunicipioFilter
 from apps.utils.utils import CreateListModelMixin
-from django.contrib.gis.geos import Point
+from django.contrib.gis.geos import Point, GEOSGeometry
 from django.contrib.gis.db.models.functions import Distance
 from rest_framework.response import Response
 from apps.utils.extra_fields import PatchModelMixin
@@ -59,13 +59,20 @@ class InmuebleViewSet(viewsets.GenericViewSet,
                                     **self.request.query_params)
         longitude = self.request.query_params.get('longitude', 0)
         latitude = self.request.query_params.get('latitude', 0)
+        polygon = self.request.query_params.get('polygon')
         distance = float(self.request.query_params.get('distance', 10)) * 1000
         if longitude == 0:
             return super().get_queryset()
-        user_location = Point(float(latitude), float(longitude), srid=4326)
-        dataset = self.queryset.annotate(
-            distance=Distance('point', user_location)
-        ).order_by('distance').filter(distance__lte=distance)
+        user_location = Point(float(longitude), float(latitude), srid=4326)
+        if polygon:
+            polygon = GEOSGeometry(polygon, 4326)
+            dataset = self.queryset.annotate(
+                distance=Distance('point', user_location),
+            ).order_by('distance').filter(point_geometry__intersects=polygon)
+        else:
+            dataset = self.queryset.annotate(
+                distance=Distance('point', user_location)
+            ).order_by('distance').filter(distance__lte=distance)
         return dataset
 
     def retrieve(self, request, *args, **kwargs):

@@ -1,5 +1,6 @@
 from celery import shared_task
 from django.core.mail import EmailMessage
+from django.core.mail import send_mail
 from django.conf import settings
 from django.template.loader import render_to_string
 from django.core.mail import EmailMultiAlternatives
@@ -66,10 +67,10 @@ def send_recommendation_emails():
 @shared_task
 def send_email_template(mail_subject: str, to: list,
                         template_name: str, context: dict, **kwargs):
-    message = render_to_string(template_name, context)
-    email = EmailMessage(
-        mail_subject, message, to=to,
-        from_email=settings.EMAIL_HOST_USER
+    # message = render_to_string(template_name, context)
+    email = EmailMessage(to=to,
+        from_email='jesus_acosta1996@hotmail.com'
     )
-    email.content_subtype = "html"
-    email.send()
+    email.template_id = template_name
+    email.dynamic_template_data = context
+    email.send(fail_silently=False)
