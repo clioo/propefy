@@ -8,7 +8,7 @@ RUN apt-get install -y wget ca-certificates gnupg2
 RUN apt-get install -y postgresql postgresql-contrib
 RUN apt-get install -y gcc libc-dev musl-dev build-essential python-psycopg2
 COPY ./requirements.txt /requirements.txt
-RUN apt-get update -y
+RUN apt-get update -y --allow-releaseinfo-change
 RUN apt-get install -y zlib1g-dev libjpeg-dev libpq-dev
 RUN apt-get install -y binutils
 RUN apt-get install -y libproj-dev
