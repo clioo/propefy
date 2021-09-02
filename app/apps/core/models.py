@@ -264,7 +264,7 @@ class Inmueble(Likable):
     views_counter = models.PositiveIntegerField(default=0)
     se_admiten_mascotas = models.BooleanField(default=False, verbose_name="¿Acepta mascotas?")
     amueblada = models.BooleanField(default=False)
-    amenidades = models.ManyToManyField('Amenidades')
+    amenidades = models.ManyToManyField('Amenidades', blank=True)
 
     def save(self, **kwargs):
         self.point = Point(self.longitud, self.latitud)
