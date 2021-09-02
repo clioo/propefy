@@ -259,8 +259,8 @@ class Inmueble(Likable):
     dentro_de_privada = models.BooleanField(default=False,
         verbose_name="¿Está dentro de privada?")
     search_vector = SearchVectorField(null=True)
-    point = gis_models.PointField(geography=True)
-    point_geometry = gis_models.PointField(geography=False)
+    point = gis_models.PointField(geography=True, blank=True)
+    point_geometry = gis_models.PointField(geography=False, blank=True)
     views_counter = models.PositiveIntegerField(default=0)
     se_admiten_mascotas = models.BooleanField(default=False, verbose_name="¿Acepta mascotas?")
     amueblada = models.BooleanField(default=False)
