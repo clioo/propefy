@@ -4,7 +4,10 @@ from apps.utils.extra_fields import ListFilter
 
 
 class InmuebleFilter(filters.FilterSet):
-    recamaras = filters.NumberFilter(field_name='recamaras', lookup_expr='gte')
+    recamaras_max = filters.NumberFilter(field_name='recamaras',
+        lookup_expr='gte')
+    recamaras_min = filters.NumberFilter(field_name='recamaras',
+        lookup_expr='lte')
     precio_min = filters.NumberFilter(field_name='precio', lookup_expr='gte')
     precio_max = filters.NumberFilter(field_name='precio', lookup_expr='lte')
     estado = filters.NumberFilter(field_name='municipio__estado')
