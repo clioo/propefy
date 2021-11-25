@@ -4,11 +4,11 @@ from .serializers import (InmuebleSerializer, ImagenesSerializer,
                           TipoPropiedadSerializer, MunicipioSerializer,
                           EstadoSerializer, HistorialVisitasSerializer,
                           ProspectoVendedorSerializer,
-                          ProspectoCompradorSerializer)
+                          ProspectoCompradorSerializer, AmenidadesSerializer)
 from apps.core.models import (Estado, Inmueble, Imagenes, Municipio,
                               TipoPropiedad, HistorialVisitas,
                               ProspectoVendedor, ProspectoComprador,
-                              HistorialBusquedas)
+                              HistorialBusquedas, Amenidades)
 from django.utils.translation import gettext_lazy as _
 from django_filters import rest_framework as filters
 from .filters import InmuebleFilter, MunicipioFilter
@@ -125,6 +125,12 @@ class TipoInmuebleViewSet(viewsets.GenericViewSet,
                           mixins.ListModelMixin):
     serializer_class = TipoPropiedadSerializer
     queryset = TipoPropiedad.objects.all()
+
+
+class AmenidadesViewSet(viewsets.GenericViewSet,
+                        mixins.ListModelMixin):
+    serializer_class = AmenidadesSerializer
+    queryset = Amenidades.objects.all()
 
 
 class EstadoViewSet(viewsets.GenericViewSet,
