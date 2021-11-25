@@ -71,6 +71,8 @@ def create_inmueble(**params):
         params['latitud'] = 1.33333
     if not params.get('longitud'):
         params['longitud'] = 1.33333
+    if not params.get('antiguedad'):
+        params['antiguedad'] = 5
     return models.Inmueble.objects.create(**params)
 
 
@@ -382,7 +384,9 @@ class PrivateInmuebleTests(TestCase):
             'categoria': categoria_renta.id,
             'tipo_propiedad': tipo_local_comercial.id,
             'latitude': 0.0,
-            'longitude': 0.0
+            'longitude': 0.0,
+            'antiguedad_min': 5,
+            'antiguedad_max': 5,
         }
         res = self.client.get(INMUEBLES_URL, search_params)
         self.assertEqual(res.status_code, status.HTTP_200_OK)

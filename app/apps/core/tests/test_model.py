@@ -95,7 +95,8 @@ class ModelTests(TestCase):
             banos=2,
             medios_banos=2,
             latitud=1.33333,
-            longitud=1.333333
+            longitud=1.333333,
+            antiguedad=5
         )
         self.assertEqual(str(inmueble), inmueble.titulo)
 
@@ -129,6 +130,7 @@ class ModelTests(TestCase):
             banos=2,
             medios_banos=2,
             latitud=1.33333,
-            longitud=1.333333
+            longitud=1.333333,
+            antiguedad=5
         )
         self.assertEqual(str(inmueble), inmueble.titulo)
