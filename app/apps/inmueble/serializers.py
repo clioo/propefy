@@ -53,7 +53,7 @@ class InmuebleSerializer(serializers.ModelSerializer):
                   'moneda', 'precio_periodo', 'status', 'estacionamientos',
                   'recamaras', 'banos', 'medios_banos', 'direccion',
                   'latitud', 'longitud', 'creada', 'actualizada',
-                  'imagenes_set', 'distance', 'is_liked', 'destacado',
+                  'imagenes_set', 'distance', 'is_liked', 'destacado', 'antiguedad',
                   'views_counter', 'm_2', 'm_2_construccion', 'se_admiten_mascotas', 'amueblada')
         extra_kwargs = {'id': {'read_only': True}}
 
