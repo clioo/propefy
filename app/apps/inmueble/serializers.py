@@ -94,7 +94,7 @@ class TipoPropiedadSerializer(serializers.ModelSerializer):
 class AmenidadesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Amenidades
-        fields = ('id', 'nombre')
+        fields = ('id', 'name')
         extra_kwargs = {'id': {'read_only': True}}
 
 
