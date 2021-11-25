@@ -8,10 +8,6 @@ class ImagenesInmuebleInline(admin.TabularInline):
     model = models.Imagenes
     fields = ('photo',)
 
-    def save_model(self, request, obj, form, change):
-        import pdb; pdb.set_trace()
-        a = 1
-
 
 class UserAdmin(BaseUserAdmin):
     ordering = ['id']
