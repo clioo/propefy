@@ -232,6 +232,7 @@ class Inmueble(Likable):
     ]
     titulo = models.CharField(max_length=255)
     descripcion = models.TextField()
+    antiguedad = models.IntegerField(verbose_name="Años de antigüedad")
     dueno = models.ForeignKey('Dueno', null=True, on_delete=models.CASCADE)
     acepta_credito = models.BooleanField(null=True, default=None)
     categoria = models.ForeignKey('Categoria', verbose_name="Categoría", on_delete=models.PROTECT)
