@@ -51,6 +51,7 @@ class InmuebleViewSet(viewsets.GenericViewSet,
     filterset_class = InmuebleFilter
     serializer_class = InmuebleSerializer
     queryset = Inmueble.objects.all()
+    pagination_class = None
 
     def get_queryset(self):
         if len(self.request.query_params.keys()) > 2\

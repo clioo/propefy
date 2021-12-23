@@ -116,7 +116,7 @@ class PublicInmuebleTests(TestCase):
                         municipio=municipio_culiacan, precio=15000)
         res = self.client.get(INMUEBLES_URL)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(res.data.get('results')), 4)
+        self.assertEqual(len(res.data), 4)
 
     def test_list_random_inmueble_simple_success(self):
         precio_periodo_mensual = sample_precio_periodo(nombre='Mensual')
@@ -168,10 +168,10 @@ class PublicInmuebleTests(TestCase):
                         municipio=municipio_culiacan, precio=15000)
         res = self.client.get(INMUEBLES_URL, {'municipio': municipio_ahome.id})
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(res.data.get('results')), 2)
+        self.assertEqual(len(res.data), 2)
         res = self.client.get(INMUEBLES_URL, {'tipo_propiedad': tipo_casa_habitacion.id})
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(res.data.get('results')), 2)
+        self.assertEqual(len(res.data), 2)
 
     def test_history_created_user_anonymous_success(self):
         """Test that history is created when retrieving a detail inmueble"""
@@ -225,7 +225,7 @@ class PublicInmuebleTests(TestCase):
                         municipio=municipio_culiacan, precio=15000)
         res = self.client.get(INMUEBLES_URL, {'dentro_de_privada': True})
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(res.data.get('results')), 1)
+        self.assertEqual(len(res.data), 1)
 
 
 class PrivateInmuebleTests(TestCase):
