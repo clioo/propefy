@@ -20,17 +20,17 @@ services:
       image: propefy-image
       networks:
         - main
-      ports: 
+      ports:
         - "8000:8000"
-      volumes: 
+      volumes:
         - ./app:/app
         - ./oauth_convert_views.py:/usr/local/lib/python3.7/site-packages/rest_framework_social_oauth2/views.py
         - ./facebook_oauth.py:/usr/local/lib/python3.7/site-packages/social_core/backends/facebook.py
       command: >
-        sh -c "python manage.py wait_for_db  && 
+        sh -c "python manage.py wait_for_db  &&
               python manage.py migrate &&
               gunicorn propefy.wsgi --access-logfile - --workers 3 --limit-request-line 32768 --limit-request-fields 1000 -b 0.0.0.0:8000"
-      depends_on: 
+      depends_on:
         - rabbitmq
         - redis
 
@@ -50,7 +50,7 @@ services:
     networks:
       - main
     restart: on-failure
-    volumes: 
+    volumes:
      - ./app:/app
 
 
@@ -69,7 +69,7 @@ services:
     image: propefy-image
     networks:
       - main
-    volumes: 
+    volumes:
       - ./app:/app
     restart: on-failure
 
@@ -80,22 +80,22 @@ services:
     networks:
       - main
 
-  # dashboard:
-  #   image: propefy-image
-  #   command:  flower -A propefy --port=5555
-  #   networks:
-  #     - main
-  #   ports:
-  #     - 5555:5555
-  #   environment:
-  #     - DEBUG=1
-  #     - SECRET_KEY=dbaa1_i7%*3r9-=z-+_mz4r-!qeed@(-a_r(g@k8jo8y3r27%m
-  #     - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]
-  #     - CELERY_BROKER=pyamqp://rabbitmq:5672
-  #   depends_on:
-  #     - app
-  #     - redis
-  #     - celery_worker_utils
+  flower:
+    image: propefy-image
+    command:  flower -A propefy --port=5555
+    networks:
+      - main
+    ports:
+      - 5555:5555
+    environment:
+      - DEBUG=1
+      - SECRET_KEY=dbaa1_i7%*3r9-=z-+_mz4r-!qeed@(-a_r(g@k8jo8y3r27%m
+      - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]
+      - CELERY_BROKER=pyamqp://rabbitmq:5672
+    depends_on:
+      - app
+      - redis
+      - celery_worker_utils
 
 networks:
   main:
