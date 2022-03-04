@@ -53,8 +53,9 @@ class InmuebleSerializer(serializers.ModelSerializer):
                   'moneda', 'precio_periodo', 'status', 'estacionamientos',
                   'recamaras', 'banos', 'medios_banos', 'direccion',
                   'latitud', 'longitud', 'creada', 'actualizada',
-                  'imagenes_set', 'distance', 'is_liked', 'destacado', 'antiguedad',
-                  'views_counter', 'm_2', 'm_2_construccion', 'se_admiten_mascotas', 'amueblada')
+                  'imagenes_set', 'distance', 'is_liked', 'destacado',
+                  'antiguedad', 'views_counter', 'm_2', 'm_2_construccion',
+                  'se_admiten_mascotas', 'amueblada', "amenidades")
         extra_kwargs = {'id': {'read_only': True}}
 
     def get_distance(self, instance):
@@ -113,12 +114,14 @@ class EstadoSerializer(serializers.ModelSerializer):
 class ProspectoVendedorSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProspectoVendedor
-        fields = ('id', 'interested_phone_number', 'created', 'updated', 'is_active')
+        fields = ('id', 'interested_phone_number', 'nombre', 'correo',
+                  'created', 'updated', 'is_active')
         extra_kwargs = {'id': {'read_only': True}}
 
 
 class ProspectoCompradorSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProspectoComprador
-        fields = ('id', 'interested_phone_number', 'created', 'updated', 'is_active')
+        fields = ('id', 'interested_phone_number', 'nombre', 'correo',
+                  'created', 'updated', 'is_active')
         extra_kwargs = {'id': {'read_only': True}}

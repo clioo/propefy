@@ -26,6 +26,16 @@ class BaseModel(models.Model):
         abstract = True
 
 
+class BaseProspectoModel(BaseModel):
+    nombre = models.CharField(max_length=255)
+    correo = models.CharField(max_length=255)
+    interested_phone_number = models.CharField(max_length=10)
+
+    class Meta:
+        abstract = True
+
+
+
 class GenericModel(models.Model):
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
@@ -366,7 +376,7 @@ class HistorialBusquedas(models.Model):
 class SpamEmail(models.Model):
     user = models.ForeignKey('User', on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
-    
+
 
 @receiver(post_save, sender=Inmueble)
 def inmueble_post_save(sender, instance, created, *args, **kwargs):
@@ -383,11 +393,11 @@ def inmueble_post_save(sender, instance, created, *args, **kwargs):
         instance.save()
 
 
-class ProspectoVendedor(BaseModel):
+class ProspectoVendedor(BaseProspectoModel):
     """Son quienes quieren vender su propiedad sin registrarse."""
-    interested_phone_number = models.CharField(max_length=10)
+    pass
 
 
-class ProspectoComprador(BaseModel):
+class ProspectoComprador(BaseProspectoModel):
     """Son quienes deciden comprar sin registrarse"""
-    interested_phone_number = models.CharField(max_length=10)
+    pass
