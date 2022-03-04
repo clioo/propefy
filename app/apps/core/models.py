@@ -30,6 +30,7 @@ class BaseProspectoModel(BaseModel):
     nombre = models.CharField(max_length=255)
     correo = models.CharField(max_length=255)
     interested_phone_number = models.CharField(max_length=10)
+    inmueble = models.ForeignKey('Inmueble', on_delete=models.PROTECT)
 
     class Meta:
         abstract = True
