@@ -112,6 +112,7 @@ class EstadoSerializer(serializers.ModelSerializer):
 
 
 class ProspectoVendedorSerializer(serializers.ModelSerializer):
+    is_active = serializers.BooleanField(default=True)
     class Meta:
         model = ProspectoVendedor
         fields = ('id', 'interested_phone_number', 'nombre', 'correo',
@@ -120,6 +121,7 @@ class ProspectoVendedorSerializer(serializers.ModelSerializer):
 
 
 class ProspectoCompradorSerializer(serializers.ModelSerializer):
+    is_active = serializers.BooleanField(default=True)
     class Meta:
         model = ProspectoComprador
         fields = ('id', 'interested_phone_number', 'nombre', 'correo',
