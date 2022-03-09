@@ -1,4 +1,5 @@
-from rest_framework import generics, authentication, permissions
+from rest_framework import (generics, authentication, permissions, viewsets,
+                            mixins)
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.settings import api_settings
 from rest_framework import status
@@ -6,7 +7,8 @@ from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from apps.user.serializers import (UserSerializer, AuthTokenSerializer,
                                    RecoveryPasswordSerializer,
-                                   SendVerificationEmail)
+                                   SendVerificationEmail,
+                                   UpdateUserSerializer)
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
@@ -17,11 +19,17 @@ from django.utils.http import urlsafe_base64_decode
 from apps.core.tokens import account_activation_token
 from django.utils.encoding import force_text
 from django.http import HttpResponse
+from apps.utils.extra_fields import PatchModelMixin
 
 class CreateUserView(generics.CreateAPIView, ObtainAuthToken):
     """Create a new user in the system"""
     serializer_class = UserSerializer
     renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
+
+
+
+class UpdateProfileViewSet(viewsets.GenericViewSet, PatchModelMixin):
+    serializer_class = UpdateUserSerializer
 
 
 class CreateTokenView(ObtainAuthToken):

@@ -386,8 +386,10 @@ def inmueble_post_save(sender, instance, created, *args, **kwargs):
 class ProspectoVendedor(BaseModel):
     """Son quienes quieren vender su propiedad sin registrarse."""
     interested_phone_number = models.CharField(max_length=10)
+    insterested_inmuebles = models.ManyToManyField("Inmueble", blank=True)
 
 
 class ProspectoComprador(BaseModel):
     """Son quienes deciden comprar sin registrarse"""
     interested_phone_number = models.CharField(max_length=10)
+    insterested_inmuebles = models.ManyToManyField("Inmueble", blank=True)

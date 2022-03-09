@@ -185,26 +185,10 @@ class InmuebleLikeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin,
 
 
 class ProspectoVendedorViewSet(BaseInmuebleViewSet):
-    permission_classes = []
     queryset = ProspectoVendedor.objects.all()
     serializer_class = ProspectoVendedorSerializer
 
-    def get_permissions(self):
-        permissions_ = super().get_permissions()
-        if self.action in ['list', 'retrieve', 'update', 'destroy']:
-            permissions_ = (permissions.IsAuthenticated(),
-                            permissions.IsAdminUser())
-        return permissions_
-
 
 class ProspectoCompradorViewSet(BaseInmuebleViewSet):
-    permission_classes = []
     queryset = ProspectoComprador.objects.all()
     serializer_class = ProspectoCompradorSerializer
-
-    def get_permissions(self):
-        permissions_ = super().get_permissions()
-        if self.action in ['list', 'retrieve', 'update', 'destroy']:
-            permissions_ = (permissions.IsAuthenticated(),
-                            permissions.IsAdminUser())
-        return permissions_
