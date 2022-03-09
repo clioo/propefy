@@ -14,7 +14,7 @@ from apps.utils.tasks import send_email_template
 class UpdateUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
-        fields = ('email', 'name', 'last_name', 'phone')
+        fields = ('name', 'last_name', 'phone')
 
 
 class UserSerializer(serializers.ModelSerializer):
