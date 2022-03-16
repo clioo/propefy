@@ -277,6 +277,7 @@ class Inmueble(Likable):
     se_admiten_mascotas = models.BooleanField(default=False, verbose_name="¿Acepta mascotas?")
     amueblada = models.BooleanField(default=False)
     amenidades = models.ManyToManyField('Amenidades', blank=True)
+    user = models.ForeignKey('User', blank=True, null=True, on_delete=models.CASCADE)
 
     def save(self, **kwargs):
         self.point = Point(self.longitud, self.latitud)

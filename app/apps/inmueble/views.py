@@ -184,6 +184,16 @@ class InmuebleLikeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin,
         return self.queryset.filter(likes__user=self.request.user)
 
 
+class MyInmuebleViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
+    serializer_class = InmuebleSerializer
+    authentication_classes = (authentication.TokenAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+    queryset = Inmueble.objects.all()
+
+    def get_queryset(self):
+        return self.queryset.filter(user=self.request.user)
+
+
 class ProspectoVendedorViewSet(BaseInmuebleViewSet):
     queryset = ProspectoVendedor.objects.all()
     serializer_class = ProspectoVendedorSerializer
