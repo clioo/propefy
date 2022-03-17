@@ -116,7 +116,7 @@ class ProspectoVendedorSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProspectoVendedor
         fields = ('id', 'interested_phone_number', 'nombre', 'correo',
-                  'inmueble', 'created', 'updated', 'is_active')
+                  'created', 'updated', 'is_active')
         extra_kwargs = {'id': {'read_only': True}}
 
 
