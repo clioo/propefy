@@ -194,11 +194,19 @@ class MyInmuebleViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
         return self.queryset.filter(user=self.request.user)
 
 
-class ProspectoVendedorViewSet(BaseInmuebleViewSet):
+class ProspectoVendedorViewSet(viewsets.GenericViewSet,
+                               mixins.ListModelMixin,
+                               mixins.CreateModelMixin,
+                               mixins.RetrieveModelMixin,
+                               CreateListModelMixin):
     queryset = ProspectoVendedor.objects.all()
     serializer_class = ProspectoVendedorSerializer
 
 
-class ProspectoCompradorViewSet(BaseInmuebleViewSet):
+class ProspectoCompradorViewSet(viewsets.GenericViewSet,
+                                mixins.ListModelMixin,
+                                mixins.CreateModelMixin,
+                                mixins.RetrieveModelMixin,
+                                CreateListModelMixin):
     queryset = ProspectoComprador.objects.all()
     serializer_class = ProspectoCompradorSerializer
