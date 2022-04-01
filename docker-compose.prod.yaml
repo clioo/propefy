@@ -129,5 +129,9 @@ services:
       - redis
       - celery_worker_utils
 
+networks:
+  main:
 volumes:
   static:
+  data:
+  redis_data:
