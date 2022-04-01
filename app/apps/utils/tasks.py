@@ -69,7 +69,7 @@ def send_email_template(mail_subject: str, to: list,
                         template_name: str, context: dict, **kwargs):
     # message = render_to_string(template_name, context)
     email = EmailMessage(to=to,
-        from_email='jesus_acosta1996@hotmail.com'
+        from_email='system@propefy.com'
     )
     email.template_id = template_name
     email.dynamic_template_data = context

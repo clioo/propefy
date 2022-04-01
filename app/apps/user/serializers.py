@@ -48,7 +48,7 @@ class UserSerializer(serializers.ModelSerializer):
         }
         send_email_template.delay(
             mail_subject=mail_subject, to=[to_email],
-            context=context, template_name='d-ed314d6cdf44405e872da5c2c4bd296e'
+            context=context, template_name="d-1cb9501bbf8c4fa2a23ff54d640b14e5"
         )
         return user
 
