@@ -261,7 +261,7 @@ class Inmueble(Likable):
     recamaras = models.IntegerField(verbose_name="recamaras")
     banos = models.IntegerField(verbose_name="Baños")
     medios_banos = models.IntegerField(verbose_name="Medios baños")
-    m_2 = models.FloatField(null=True, verbose_name="Metros cuadrados totales")
+    m_2 = models.FloatField(null=True, verbose_name="Metros cuadrados de terreno")
     m_2_construccion = models.FloatField(null=True,
         verbose_name="Metros cuadrados de construcción")
     direccion = models.CharField(max_length=255)
