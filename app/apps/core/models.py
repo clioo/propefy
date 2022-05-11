@@ -215,6 +215,9 @@ class PrecioPeriodo(models.Model):
 class Amenidades(models.Model):
     name = models.CharField(max_length=255)
 
+    def __str__(self):
+        return self.name
+
 
 class Dueno(models.Model):
     nombre = models.CharField(max_length=255)
