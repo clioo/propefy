@@ -25,6 +25,15 @@ PROSPECTO_COMPRADOR = reverse('inmueble:prospecto-comprador-list')
 PROSPECTO_VENDEDOR = reverse('inmueble:prospecto-vendedor-list')
 
 
+def get_dummy_inmueble() -> models.Inmueble:
+    tipo_casa_habitacion = sample_tipo_propiedad(nombre='Casa habitación')
+    categoria_venta = sample_categoria(nombre='Venta')
+    municipio_ahome = sample_municipio(nombre='Ahome', cve_municipio='12')
+    return create_inmueble(tipo_propiedad=tipo_casa_habitacion,
+                            categoria=categoria_venta,
+                            municipio=municipio_ahome, precio=1000000)
+
+
 def get_detail_inmueble_url(id: int) -> str:
     return reverse('inmueble:public-inmuebles-detail', args=[id,])
 
@@ -412,9 +421,14 @@ class ProspectoTests(TestCase):
 
     def test_prospecto_compra_create_success(self):
         self.client.logout()
-        res = self.client.post(PROSPECTO_COMPRADOR, {
-            'interested_phone_number': '6681596072'
-        })
+        inmueble = get_dummy_inmueble()
+        payload = {
+            "nombre": "Juan",
+            'correo': 'jesus_acosta1996@hotmail.com',
+            'interested_phone_number': '6681596072',
+            'inmueble': inmueble.id,
+        }
+        res = self.client.post(PROSPECTO_COMPRADOR, payload)
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
 
     def test_prospecto_compra_list_normal_user_error(self):
@@ -424,8 +438,11 @@ class ProspectoTests(TestCase):
 
     def test_prospecto_compra_retrieve_normal_user_error(self):
         self.client.logout()
+        inmueble = get_dummy_inmueble()
         pros = models.ProspectoComprador.objects.create(
-            interested_phone_number='6681596072')
+            interested_phone_number='6681596072',
+            inmueble=inmueble
+        )
         url = get_detail_prospecto_comprador_url(pros.id)
         res = self.client.get(url)
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
@@ -439,8 +456,11 @@ class ProspectoTests(TestCase):
     def test_prospecto_compra_retrieve_admin_user_success(self):
         user = sample_user(email='test1@test.com', is_staff=True)
         self.client.force_authenticate(user)
+        inmueble = get_dummy_inmueble()
         pros = models.ProspectoComprador.objects.create(
-            interested_phone_number='6681596072')
+            interested_phone_number='6681596072',
+            inmueble=inmueble
+        )
         url = get_detail_prospecto_comprador_url(pros.id)
         res = self.client.get(url)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
