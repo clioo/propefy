@@ -22,6 +22,7 @@ services:
         - main
       ports:
         - "8000:8000"
+        - "8888:8888"
       volumes:
         - ./app:/app
         - ./oauth_convert_views.py:/usr/local/lib/python3.7/site-packages/rest_framework_social_oauth2/views.py
@@ -82,7 +83,7 @@ services:
 
   flower:
     image: propefy-image
-    command:  flower -A propefy --port=5555
+    command:  celery flower --port=5555
     networks:
       - main
     ports:

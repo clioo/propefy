@@ -1,4 +1,4 @@
-FROM python:3.7-slim
+FROM python:3.8-slim
 
 ENV PYTHONUNBUFFERED 1
 
@@ -34,5 +34,7 @@ RUN python3 manage.py collectstatic --no-input
 RUN chmod -R 755 /vol/web
 RUN chmod -R 755 /vol/web/static
 RUN chmod -R 755 /bin/wait-for
+RUN mkdir /home/user
+RUN chown -R user:user /home/user
 USER user
 EXPOSE 8000

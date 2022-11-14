@@ -1,0 +1,133 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+default_language_version:
+    python: python3
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v2.2.3
+    hooks:
+    -   id: check-ast
+        name: python check ast
+    -   id: trailing-whitespace
+        name: trim trailing whitespace
+        files: (.*\.py$|.*\.css$|.*\.js$|.*\.html$)
+        exclude: (^.*\/migrations\/.*\.py$|.*\/node_modules\/.*)
+    -   id: end-of-file-fixer
+        name: end of line fixer
+        files: (.*\.py$|.*\.css$|.*\.js$|.*\.html$)
+        exclude: (^.*\/migrations\/.*\.py$|.*\/node_modules\/.*)
+    -   id: check-merge-conflict
+        name: check merge conflicts
+-   repo: https://github.com/python/black
+    rev: 19.3b0
+    hooks:
+    -   id: black
+        files: (?x)^.*\/.*\.pyi?$
+        exclude: >
+            (?x)^(.*\/migrations\/.*\.py)$|
+                ^(
+                shopping|
+                tests|
+                templates|
+                (apps\/(
+                    adtrack|
+                    adzerk|
+                    api|
+                    app_settings|
+                    apple_pay|
+                    banners|
+                    bizdev|
+                    blacklist|
+                    brandcenter|
+                    brandpermissions|
+                    brandrequest|
+                    business_rules_engine|
+                    cached|
+                    calls|
+                    carts|
+                    catalog_review|
+                    catalog_sync_api|
+                    catalog_workflow|
+                    checkout|
+                    customer_incentives|
+                    customer_orders_api|
+                    customer_watchlist_screening|
+                    datastore|
+                    data_requests|
+                    delivery_slots|
+                    draftable|
+                    edenred|
+                    email_templating|
+                    employee_onboarding|
+                    external_catalog|
+                    flow|
+                    geo_onboarding|
+                    hiring|
+                    hiring_automator|
+                    human_resources|
+                    intercom|
+                    issues|
+                    kafka|
+                    loyalty|
+                    loyalty_api|
+                    market_prelaunch|
+                    marqeta|
+                    mass_mailing|
+                    metrics|
+                    model_logger|
+                    mtasker|
+                    oauth2_ext|
+                    opstasks_api|
+                    opstasks_workflow|
+                    partnerships|
+                    payroll_generator|
+                    promotions|
+                    promotions_api|
+                    receipts|
+                    recommendations|
+                    reengagement|
+                    referrals|
+                    registration|
+                    remote_config|
+                    reports|
+                    search|
+                    shopper_account|
+                    shopper_background_check|
+                    shopper_booklogs|
+                    shopper_cards|
+                    shopper_cards_notifications|
+                    shopper_cards_payments|
+                    shopper_notifications|
+                    shopper_statistics|
+                    sii|
+                    social_media|
+                    social_media_api|
+                    sponsors|
+                    srm|
+                    stores|
+                    stores_cornershoppay|
+                    stores_integration_services|
+                    stores_prospects|
+                    stores_watchlist_screening|
+                    summary|
+                    support|
+                    tipping|
+                    todo|
+                    users|
+                    web|
+                    webhooks|
+                    workflows
+                ))
+            )\/.*\.pyi?$
+        language: python
+
+-   repo: https://github.com/PyCQA/bandit
+    rev: '1.6.2'
+    hooks:
+    - id: bandit
+      name: bandit
+      files: apps
+      language_version: python
+      exclude: ^(.*/test/.*|.*/tests/.*|.*/test\.py|.*/tests\.py|.*/migrations/.*)$
+      args:
+          - --config=.bandit.yaml
