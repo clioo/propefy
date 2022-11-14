@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+import sys
 from celery.schedules import crontab
 from celery.schedules import solar
 
@@ -55,6 +56,7 @@ INSTALLED_APPS = [
     'oauth2_provider',
     'social_django',
     'rest_framework_social_oauth2',
+    "django_extensions",
 ]
 
 MIDDLEWARE = [
@@ -200,7 +202,41 @@ CELERY_BEAT_SCHEDULE = {
 }
 EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
 
+# Shell plus for jupyter
+SHELL_PLUS = "ipython"
+SHELL_PLUS_PRINT_SQL = True
+NOTEBOOK_ARGUMENTS = [
+    "--ip",
+    "0.0.0.0",
+    "--port",
+    "8888",
+    "--allow-root",
+    "--no-browser",
+]
+IPYTHON_ARGUMENTS = [
+    "--ext",
+    "django_extensions.management.notebook_extension",
+    "--debug",
+]
+IPYTHON_KERNEL_DISPLAY_NAME = "Django Shell-Plus"
+
+# autofields
+DEFAULT_AUTO_FIELD='django.db.models.AutoField'
+
+
 try:
     from .local_settings import *
 except ImportError:
     pass
+
+if 'test' in sys.argv:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.contrib.gis.db.backends.postgis',
+            'HOST': 'db',
+            'PORT': 5432,
+            'NAME': 'app',
+            'USER': 'postgres',
+            'PASSWORD': 'supersecretpassword',
+        }
+    }
