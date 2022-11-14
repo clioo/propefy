@@ -1,30 +1,11 @@
 from rest_framework import serializers
-from django.contrib.auth import get_user_model
 from apps.core.models import (Inmueble, Imagenes, TipoPropiedad, Municipio,
                               Estado, HistorialVisitas, ProspectoComprador,
                               ProspectoVendedor, Amenidades)
 from apps.utils.extra_fields import HdBase64ImageField, ThumbnailBase64ImageField
-from apps.user.serializers import UserSerializer
 from apps.utils.extra_fields import RelatedFieldObjectRetriever
-from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from math import sin, cos, sqrt, atan2, radians
-
-
-def calculate_distance(lat1_: float, lon1_: float, lat2_: float, lon2_: float):
-    # approximate radius of earth in km
-    R = 6373.0
-    lat1 = radians(lat1_)
-    lon1 = radians(lon1_)
-    lat2 = radians(lat2_)
-    lon2 = radians(lon2_)
-    dlon = lon2 - lon1
-    dlat = lat2 - lat1
-    a = sin(dlat / 2)**2 + cos(lat1) * cos(lat2) * sin(dlon / 2)**2
-    c = 2 * atan2(sqrt(a), sqrt(1 - a))
-    distance = R * c
-    # returns distance in KM
-    return distance
+from apps.inmueble.providers import inmueble_provider
 
 
 class ImagenesSerializer(serializers.ModelSerializer):
@@ -61,15 +42,9 @@ class InmuebleSerializer(serializers.ModelSerializer):
     def get_distance(self, instance):
         try:
             distance = instance.distance.m
-        except:
+        except AttributeError:
             distance = 'Distance not available'
         return distance
-    #     user_lat = self.context['request'].query_params.get('latitude', 0)
-    #     user_lon = self.context['request'].query_params.get('longitude', 0)
-    #     if user_lat == 0:
-    #         return "Distancia no disponible."
-    #     return calculate_distance(instance.latitud, instance.longitud,
-    #                               float(user_lat), float(user_lon))
 
     def get_is_liked(self, instance):
         if not self.context['request'].user.is_anonymous:
@@ -77,6 +52,31 @@ class InmuebleSerializer(serializers.ModelSerializer):
                 user_id=self.context['request'].user.id).exists()
         return (_('Not authenticated.'))
 
+
+class SingleInmuebleSerializer(InmuebleSerializer):
+    inmuebles_of_interest = serializers.SerializerMethodField(read_only=True)
+    class Meta:
+        model = Inmueble
+        fields = ('id', 'titulo', 'descripcion', 'dueno', 'acepta_credito',
+                  'categoria', 'tipo_propiedad', 'municipio', 'precio',
+                  'moneda', 'precio_periodo', 'status', 'estacionamientos',
+                  'recamaras', 'banos', 'medios_banos', 'direccion',
+                  'latitud', 'longitud', 'creada', 'actualizada',
+                  'imagenes_set', 'distance', 'is_liked', 'destacado',
+                  'antiguedad', 'views_counter', 'm_2', 'm_2_construccion',
+                  'se_admiten_mascotas', 'amueblada', "amenidades",
+                  "inmuebles_of_interest")
+        extra_kwargs = {'id': {'read_only': True}}
+
+    def get_inmuebles_of_interest(self, instance):
+        if not instance.latitud or not instance.longitud:
+            return []
+        point = instance.point
+        inmuebles = inmueble_provider.get_closest_inmuebles_by_point_ordered_by_distance(
+            queryset=Inmueble.objects.all(),
+            point=point
+        ).exclude(id=instance.id)[:3]
+        return [inmueble.id for inmueble in inmuebles]
 
 class HistorialVisitasSerializer(serializers.ModelSerializer):
     class Meta:

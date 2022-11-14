@@ -21,6 +21,7 @@ class InmuebleFilter(filters.FilterSet):
     estado = filters.NumberFilter(field_name='municipio__estado')
     full_text = filters.Filter(field_name='search_vector', lookup_expr='icontains')
     tipo_propiedad = ListFilter(field_name='tipo_propiedad_id')
+    ids = ListFilter(field_name='id')
     class Meta:
         model = Inmueble
         fields = ('titulo', 'descripcion', 'dueno', 'acepta_credito',
